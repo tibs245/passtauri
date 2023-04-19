@@ -7,11 +7,11 @@ use std::fs::File;
 //   windows_subsystem = "windows"
 // )]
 
-
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![read_password])
         .invoke_handler(tauri::generate_handler![explore::list_password])
+        .invoke_handler(tauri::generate_handler![explore::list_password_path])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
