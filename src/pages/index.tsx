@@ -1,14 +1,30 @@
 import Head from 'next/head'
-import { Inter } from 'next/font/google'
-import { Container, Stack, StackDivider, Text } from '@chakra-ui/react'
-import { useListPassword } from '@/hooks/password'
-import FolderItem from '@/components/FolderItem'
-
-const inter = Inter({ subsets: ['latin'] })
+import { Box, Heading, Flex, Stack } from '@chakra-ui/react'
+import PasswordList from '@/components/PasswordList'
+import { useState } from 'react'
+import PassBreadcrumb from '@/components/PassBreadcrumb';
+import NoSelectedPassword from '@/components/NoSelectedPassword';
+import PasswordDetails from '@/components/PasswordDetails';
+import { FileDto } from '@/types/file';
 
 export default function Home() {
-  const { data: listPassword, isLoading, error } = useListPassword();
-  console.log({ listPassword, isLoading })
+  const [path, setPath] = useState<string[]>([]);
+  const [passwordSelectionned, setPasswordSelectionned] = useState<FileDto | undefined>();
+
+  const addFolderToPath = (newFolder: string) => setPath([...path, newFolder])
+
+  const goToFolder = (folder: string) => {
+    if (folder === "ROOT") {
+      setPath([]);
+    }
+
+    const indexPath = path.indexOf(folder);
+    setPath(path.slice(0, indexPath + 1))
+  }
+
+  const handleClickPassword = (passwordFile: FileDto) => {
+    setPasswordSelectionned(passwordFile);
+  }
 
   return (
     <>
@@ -18,18 +34,25 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <Container>
-          <Text as="h1" fontSize="6xl">PassTauri</Text>
-          {error}
-          <Stack
-            spacing={0}
-            divider={<StackDivider borderColor='gray.200' />}>
-            {listPassword?.map(password => <FolderItem key={password}
-              _hover={{ backgroundColor: 'gray.100' }}>{password}</FolderItem>)}
+      <main style={{ height: "100vh" }}>
+        <Flex as="header" bgColor="gray.200" height="5em" alignItems="center" padding={9}>
+          <Stack>
+            <Heading as="h1" fontSize="2xl">PassTauri</Heading>
+
+            <PassBreadcrumb path={path} onClickFolder={goToFolder} />
           </Stack>
-        </Container>
-      </main>
+        </Flex>
+        <Flex minHeight="calc(100vh - 5em)">
+          <Box overflowY="scroll" maxHeight="calc(100vh - 5em)" minWidth="20em" maxWidth="20vw" borderRightColor="grau.400" borderRightWidth="1px">
+            <PasswordList path={path} onClickFolder={addFolderToPath} onClickPassword={handleClickPassword} />
+          </Box>
+          <Box flex="1" padding={5}>
+            {passwordSelectionned ?
+              <PasswordDetails passwordFile={passwordSelectionned} /> :
+              <NoSelectedPassword />}
+          </Box>
+        </Flex>
+      </main >
     </>
   )
 }

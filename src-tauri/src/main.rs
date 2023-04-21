@@ -1,6 +1,5 @@
-mod explore;
-use gpgme::{Context, Protocol};
-use std::fs::File;
+pub mod pass;
+pub mod utils;
 
 // #![cfg_attr(
 //   all(not(debug_assertions), target_os = "windows"),
@@ -9,20 +8,8 @@ use std::fs::File;
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![read_password])
-        .invoke_handler(tauri::generate_handler![explore::list_password])
-        .invoke_handler(tauri::generate_handler![explore::list_password_path])
+        .invoke_handler(tauri::generate_handler![pass::explore::list_password])
+        .invoke_handler(tauri::generate_handler![pass::explore::list_password_path])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-}
-
-#[tauri::command]
-fn read_password(name: &str) -> String {
-    let mut ctx = Context::from_protocol(Protocol::OpenPgp).unwrap();
-    let mut input = File::open("/home/tibs/.password-store/perso/ce-sii.gpg").unwrap();
-    let mut output = Vec::new();
-    ctx.decrypt(&mut input, &mut output)
-        .map_err(|e| format!("decrypting failed: {:?}", e));
-
-    String::from_utf8_lossy(&output).into()
 }
