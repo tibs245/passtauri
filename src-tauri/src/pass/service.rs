@@ -2,7 +2,8 @@ use crate::pass::entities::file_details::FileDetails;
 use crate::pass::entities::password_data::PasswordData;
 
 use crate::pass::error::PassError;
-use crate::pass::repository::{decrypt_password_file, list_files_path};
+
+use super::repository::{decrypt_password_file, list_files_path, search_files};
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
     let password_data = decrypt_password_file(password_path)?;
@@ -38,4 +39,16 @@ pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
         .map(|f| -> FileDetails { f.unwrap().into() })
         .filter(|file| !file.is_cached_dir())
         .collect())
+}
+
+pub fn search_password(path: &str, search: &str) -> Result<Option<Vec<FileDetails>>, PassError> {
+    Ok(match search_files(path, search)? {
+        Some(results) => Some(
+            results
+                .iter()
+                .map(|f| -> FileDetails { f.into() })
+                .collect(),
+        ),
+        None => None,
+    })
 }

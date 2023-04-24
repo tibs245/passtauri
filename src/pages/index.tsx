@@ -6,20 +6,28 @@ import PassBreadcrumb from '@/components/PassBreadcrumb';
 import NoSelectedPassword from '@/components/NoSelectedPassword';
 import PasswordDetails from '@/components/PasswordDetails';
 import { FileDto } from '@/types/file';
+import SearchBar from '@/components/SearchBar';
+import SearchResult from '@/components/searchResult';
 
 export default function Home() {
   const [path, setPath] = useState<string[]>([]);
+  const [search, setSearch] = useState<string>("");
   const [passwordSelectionned, setPasswordSelectionned] = useState<FileDto | undefined>();
 
   const addFolderToPath = (newFolder: string) => setPath([...path, newFolder])
 
-  const goToFolder = (folder: string) => {
+  const goBackToFolder = (folder: string) => {
     if (folder === "ROOT") {
       setPath([]);
     }
 
     const indexPath = path.indexOf(folder);
     setPath(path.slice(0, indexPath + 1))
+  }
+
+  const goToFolder = (folder: string) => {
+    setPath(folder.split('/'))
+    setSearch("")
   }
 
   const handleClickPassword = (passwordFile: FileDto) => {
@@ -39,12 +47,17 @@ export default function Home() {
           <Stack>
             <Heading as="h1" fontSize="2xl">PassTauri</Heading>
 
-            <PassBreadcrumb path={path} onClickFolder={goToFolder} />
+            <PassBreadcrumb path={path} onClickFolder={goBackToFolder} />
           </Stack>
         </Flex>
         <Flex minHeight="calc(100vh - 5em)">
           <Box overflowY="scroll" maxHeight="calc(100vh - 5em)" minWidth="20em" maxWidth="20vw" borderRightColor="grau.400" borderRightWidth="1px">
-            <PasswordList path={path} onClickFolder={addFolderToPath} onClickPassword={handleClickPassword} />
+            <SearchBar onSearch={setSearch} />
+            {search === "" ?
+              <PasswordList path={path} onClickFolder={addFolderToPath} onClickPassword={handleClickPassword} />
+              :
+              <SearchResult searchWord={search} path={path} onClickFolder={goToFolder} onClickPassword={handleClickPassword} />
+            }
           </Box>
           <Box flex="1" padding={5}>
             {passwordSelectionned ?

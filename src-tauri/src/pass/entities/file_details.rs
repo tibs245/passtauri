@@ -30,6 +30,7 @@ impl From<FileType> for FileTypeAPI {
         }
     }
 }
+
 pub struct FileDetails {
     pub filename: String,
     pub path: String,
@@ -43,8 +44,8 @@ impl FileDetails {
     }
 }
 
-impl From<DirEntry> for FileDetails {
-    fn from(file_data: DirEntry) -> FileDetails {
+impl From<&DirEntry> for FileDetails {
+    fn from(file_data: &DirEntry) -> FileDetails {
         FileDetails {
             filename: file_data.file_name().to_string_lossy().to_string(),
             path: file_data.path().to_string_lossy().to_string(),
@@ -54,6 +55,12 @@ impl From<DirEntry> for FileDetails {
                 Err(_) => SystemTime::UNIX_EPOCH,
             },
         }
+    }
+}
+
+impl From<DirEntry> for FileDetails {
+    fn from(file_data: DirEntry) -> FileDetails {
+        FileDetails::from(&file_data)
     }
 }
 

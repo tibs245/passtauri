@@ -15,3 +15,11 @@ pub fn list_password_path(path: &str) -> Result<String, String> {
         Err(error) => Err(error.to_string()),
     }
 }
+
+#[tauri::command]
+pub fn search_password(path: &str, search: &str) -> Result<String, String> {
+    match serde_json::to_string(&service::search_password(path, search)?) {
+        Ok(result) => Ok(result),
+        Err(error) => Err(error.to_string()),
+    }
+}

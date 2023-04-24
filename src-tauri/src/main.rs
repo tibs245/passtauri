@@ -11,6 +11,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             pass::explore::list_password,
             pass::explore::list_password_path,
+            pass::explore::search_password,
             pass::pass::read_password
         ])
         .run(tauri::generate_context!())
