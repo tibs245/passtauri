@@ -1,8 +1,11 @@
 import { usePassword } from "@/hooks/password";
 import { FileDto } from "@/types/file";
-import { Flex, FlexProps, Button, Icon, Stack, Heading, Text, Spacer, Spinner, Input, Textarea, Box } from "@chakra-ui/react";
+import { Flex, FlexProps, Button, Icon, Stack, Heading, Text, Spacer, Spinner, Input, Textarea, Box, InputGroup, InputRightElement, CircularProgress, CircularProgressLabel } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
-import { FiEdit, FiEye, FiShield, FiTrash2 } from "react-icons/fi";
+import { FiClipboard, FiEdit, FiEye, FiShield, FiTrash2 } from "react-icons/fi";
+import { readText, writeText } from '@tauri-apps/api/clipboard';
+
+const SECOND_DURING_PASSWORD_COPIED = 30;
 
 export type PasswordHiddenDetails = FlexProps & {
     passwordFile: FileDto
@@ -49,11 +52,55 @@ function PasswordDetails({ passwordFile }: PasswordHiddenDetails) {
     return <Stack spacing={5}>
         <Box>
             <Text>Password</Text>
-            <Input value={password?.password} isReadOnly />
+            <InputGroup>
+                <Input value={password?.password} isReadOnly />
+                <TimeToProgress password={password?.password || 'error'} />
+            </InputGroup>
         </Box>
         <Box>
             <Text>Extra information</Text>
             <Textarea value={password?.extra} isReadOnly />
         </Box>
     </Stack>
+}
+
+type TimeToProgressProps = {
+    password: string;
+}
+
+function TimeToProgress({ password }: TimeToProgressProps) {
+    const [secondBeforeReset, setSecondBeforeReset] = useState<number>(0)
+    const [oldTextClipboard, setOldTextClipboard] = useState<string | null>(null)
+
+    const handleClipboardClick = async () => {
+        setOldTextClipboard(await readText())
+        await writeText(password);
+        setSecondBeforeReset(30); // Pour l'affichage
+        let secondBeforeResetIntern = 30; // Pour la fonction
+        console.log({ secondBeforeReset })
+
+        let resetInterval = setInterval(() => {
+            setSecondBeforeReset(secondBeforeResetIntern - 1);
+            secondBeforeResetIntern = secondBeforeResetIntern - 1
+        }, 1000)
+
+        setTimeout(() => {
+            writeText(oldTextClipboard || '');
+            setOldTextClipboard(null);
+            if (resetInterval) {
+                clearInterval(resetInterval)
+            }
+            setSecondBeforeReset(0);
+        }, SECOND_DURING_PASSWORD_COPIED * 1000)
+
+    }
+
+    return <InputRightElement children={
+        secondBeforeReset !== 0 ?
+            <CircularProgress value={secondBeforeReset} min={0} max={SECOND_DURING_PASSWORD_COPIED} color='blue.400' size="1.5em">
+                <CircularProgressLabel>{secondBeforeReset}</CircularProgressLabel>
+            </CircularProgress>
+            :
+            <Icon as={FiClipboard} color='gray.500' onClick={handleClipboardClick} cursor="pointer" />
+    } />
 }
