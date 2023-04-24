@@ -4,6 +4,8 @@ use std::io::Error;
 pub enum PassError {
     PasswordStorePathNotFound,
     UnableToReadPath(String, Error),
+    OpenPgpProtocolNotFound,
+    UnableToOpenPasswordFile(Error),
 }
 
 impl From<PassError> for String {
@@ -14,6 +16,12 @@ impl From<PassError> for String {
             }
             PassError::UnableToReadPath(path, error_path) => {
                 format!("Unable to read path {} because : {}", path, error_path)
+            }
+            PassError::OpenPgpProtocolNotFound => {
+                "Impossible use Openpgp protocol : It's installed ?".to_string()
+            }
+            PassError::UnableToOpenPasswordFile(error) => {
+                format!("Impossible to open password file : {}", error)
             }
         }
     }

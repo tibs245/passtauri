@@ -8,8 +8,11 @@ pub mod utils;
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![pass::explore::list_password])
-        .invoke_handler(tauri::generate_handler![pass::explore::list_password_path])
+        .invoke_handler(tauri::generate_handler![
+            pass::explore::list_password,
+            pass::explore::list_password_path,
+            pass::pass::read_password
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

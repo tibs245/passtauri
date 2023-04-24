@@ -1,10 +1,9 @@
-#[tauri::command]
-fn read_password(name: &str) -> String {
-    let mut ctx = Context::from_protocol(Protocol::OpenPgp).unwrap();
-    let mut input = File::open("/home/tibs/.password-store/perso/ce-sii.gpg").unwrap();
-    let mut output = Vec::new();
-    ctx.decrypt(&mut input, &mut output)
-        .map_err(|e| format!("decrypting failed: {:?}", e));
+use super::service;
 
-    String::from_utf8_lossy(&output).into()
+#[tauri::command]
+pub fn read_password(password_path: &str) -> Result<String, String> {
+    match serde_json::to_string(&service::get_password_data(password_path)?) {
+        Ok(result) => Ok(result),
+        Err(error) => Err(error.to_string()),
+    }
 }

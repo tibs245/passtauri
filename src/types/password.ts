@@ -1,4 +1,4 @@
-export type password = {
+export type Password = {
     name: string;
     brutContent: string;
     login: string;
