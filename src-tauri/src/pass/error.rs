@@ -6,6 +6,7 @@ pub enum PassError {
     UnableToReadPath(String, Error),
     OpenPgpProtocolNotFound,
     UnableToOpenPasswordFile(Error),
+    UnableToDeletePasswordFile(Error),
 }
 
 impl From<PassError> for String {
@@ -21,6 +22,9 @@ impl From<PassError> for String {
                 "Impossible use Openpgp protocol : It's installed ?".to_string()
             }
             PassError::UnableToOpenPasswordFile(error) => {
+                format!("Impossible to open password file : {}", error)
+            }
+            PassError::UnableToDeletePasswordFile(error) => {
                 format!("Impossible to open password file : {}", error)
             }
         }

@@ -17,6 +17,13 @@ fn open_password_file(password_path: &str) -> Result<fs::File, PassError> {
     }
 }
 
+pub fn delete_password_file(password_path: &str) -> Result<(), PassError> {
+    match fs::remove_file(password_path) {
+        Ok(_) => Ok(()),
+        Err(error) => Err(PassError::UnableToDeletePasswordFile(error)),
+    }
+}
+
 pub fn decrypt_password_file(password_path: &str) -> Result<String, PassError> {
     let mut ctx = get_context_openpgp_protocol()?;
     let mut input = open_password_file(password_path)?;
@@ -43,7 +50,7 @@ pub fn list_files_path(path: &str) -> Result<fs::ReadDir, PassError> {
 }
 
 pub fn search_files(path: &str, search: &str) -> Result<Option<Vec<fs::DirEntry>>, PassError> {
-    let searchLowercase = search.to_lowercase();
+    let search_lowercase = search.to_lowercase();
     let result: Vec<fs::DirEntry> = list_files_path(path)?
         .filter(|f| {
             f.as_ref()
@@ -70,7 +77,7 @@ pub fn search_files(path: &str, search: &str) -> Result<Option<Vec<fs::DirEntry>
                 .to_string_lossy()
                 .to_string()
                 .to_lowercase()
-                .contains(&searchLowercase)
+                .contains(&search_lowercase)
             {
                 result.push(dir_entry);
             }

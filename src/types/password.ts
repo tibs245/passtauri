@@ -1,7 +1,7 @@
 export type Password = {
     name: string;
     brutContent: string;
-    login: string;
+    username: string;
     password: string;
     otp: string;
     lastUpdated: string;

@@ -8,11 +8,13 @@ import PasswordDetails from '@/components/PasswordDetails';
 import { FileDto } from '@/types/file';
 import SearchBar from '@/components/SearchBar';
 import SearchResult from '@/components/searchResult';
+import PasswordForm from '@/components/PasswordForm';
 
 export default function Home() {
   const [path, setPath] = useState<string[]>([]);
   const [search, setSearch] = useState<string>("");
   const [passwordSelectionned, setPasswordSelectionned] = useState<FileDto | undefined>();
+  const [isModeEdition, setIsModeEdition] = useState(false);
 
   const addFolderToPath = (newFolder: string) => setPath([...path, newFolder])
 
@@ -31,6 +33,7 @@ export default function Home() {
   }
 
   const handleClickPassword = (passwordFile: FileDto) => {
+    setIsModeEdition(false);
     setPasswordSelectionned(passwordFile);
   }
 
@@ -61,7 +64,11 @@ export default function Home() {
           </Box>
           <Box flex="1" padding={5}>
             {passwordSelectionned ?
-              <PasswordDetails passwordFile={passwordSelectionned} /> :
+              isModeEdition ?
+                <PasswordForm passwordFile={passwordSelectionned} onDeletePassword={() => setPasswordSelectionned(undefined)} />
+                :
+                <PasswordDetails passwordFile={passwordSelectionned} onEditAsked={() => setIsModeEdition(true)} onDeletePassword={() => setPasswordSelectionned(undefined)} />
+              :
               <NoSelectedPassword />}
           </Box>
         </Flex>
