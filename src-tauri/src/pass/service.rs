@@ -1,3 +1,5 @@
+use rand::{distributions::Alphanumeric, Rng};
+
 use crate::pass::entities::file_details::FileDetails;
 use crate::pass::entities::password_data::PasswordData;
 
@@ -51,4 +53,18 @@ pub fn search_password(path: &str, search: &str) -> Result<Option<Vec<FileDetail
         ),
         None => None,
     })
+}
+
+// Directly inspired by : https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#create-random-passwords-from-a-set-of-user-defined-characters
+pub fn generate_string(list_of_caractere: &str, size: usize) -> String {
+    let charset: Vec<char> = list_of_caractere.chars().collect();
+
+    let mut rng = rand::thread_rng();
+
+    (0..size)
+        .map(|_| {
+            let idx = rng.gen_range(0..charset.len());
+            charset[idx] as char
+        })
+        .collect()
 }

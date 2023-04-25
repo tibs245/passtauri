@@ -12,7 +12,8 @@ fn main() {
             pass::explore::list_password,
             pass::explore::list_password_path,
             pass::explore::search_password,
-            pass::pass::read_password
+            pass::pass::read_password,
+            pass::pass::generate_password
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
