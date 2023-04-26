@@ -5,7 +5,9 @@ export type TauriFetcherArgs = {
     args?: InvokeArgs
 }
 
-export const TauriFetcher = <T>({ command, args }: TauriFetcherArgs): Promise<T> => {
-    console.log({ invoke: command, args })
-    return invoke<string>(command, args).then(v => JSON.parse(v))
+export const TauriFetcher = <T>({ command, args }: TauriFetcherArgs, argsMutation: InvokeArgs = {}): Promise<T> => {
+
+    console.log({ invoke: command, args, argsMutation: argsMutation?.arg })
+    const argMut = argsMutation?.arg as Object
+    return invoke<string>(command, { ...args, ...argMut }).then(v => JSON.parse(v))
 }

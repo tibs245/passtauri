@@ -4,49 +4,14 @@ use crate::pass::entities::file_details::FileDetails;
 use crate::pass::entities::password_data::PasswordData;
 
 use crate::pass::error::PassError;
-use regex::Regex;
 
 use super::repository::{
-    decrypt_password_file, delete_password_file, list_files_path, search_files,
+    self, decrypt_password_file, delete_password_file, is_password_file_exist, list_files_path,
+    search_files,
 };
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
     let password_data = decrypt_password_file(password_path)?;
-
-    let mut line_number = 0;
-    let mut password = String::from("");
-    let mut extra: Option<String> = None;
-    let mut username: Option<String> = None;
-    let mut otp: Option<String> = None;
-
-    let username_regex = Regex::new(r"^username:\s(\S)\s*$").unwrap();
-    let otp_regex = Regex::new(r"^otpauth:").unwrap();
-
-    for line in password_data.split('\n') {
-        line_number = line_number + 1;
-
-        if line_number == 1 {
-            password = line.to_string();
-            continue;
-        }
-
-        if username_regex.is_match(line) {
-            username = Some(username_regex.find(line).unwrap().as_str().to_string());
-            continue;
-        }
-
-        if otp_regex.is_match(line) {
-            otp = Some(line.to_string());
-            continue;
-        }
-
-        if extra.is_some() || line != "" {
-            extra = Some(match extra {
-                Some(extradata) => extradata + line + &"\n",
-                None => line.to_owned() + &"\n",
-            })
-        }
-    }
 
     Ok(PasswordData {
         name: password_path
@@ -55,10 +20,7 @@ pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError>
             .last()
             .unwrap()
             .replace(&".gpg", &""),
-        password: password,
-        extra: extra,
-        username: username,
-        otp: otp,
+        ..PasswordData::from(password_data)
     })
 }
 
@@ -93,6 +55,41 @@ pub fn generate_string(list_of_caractere: &str, size: usize) -> String {
             charset[idx] as char
         })
         .collect()
+}
+
+fn encrypt_password(password_data: PasswordData, password_path: &str) -> Result<(), PassError> {
+    let recipients = repository::get_keys(vec!["A55C6AADE9A6B18BEA78E857FC406DBF8E8EDB24"])?;
+    let result_data = repository::encrypt_string(password_data.into(), recipients)?;
+    repository::write_password_file(password_path, result_data)
+}
+
+pub fn create_password(password_data: PasswordData, password_path: &str) -> Result<(), PassError> {
+    if is_password_file_exist(password_path) {
+        Err(PassError::PasswordFileAlreadyExists)
+    } else {
+        encrypt_password(password_data, password_path)
+    }
+}
+
+pub fn update_password(password_data: PasswordData, password_path: &str) -> Result<(), PassError> {
+    let password_old_name = password_path
+        .to_string()
+        .split('/')
+        .last()
+        .unwrap()
+        .replace(&".gpg", &"");
+
+    if password_old_name != password_data.name {
+        create_password(
+            password_data.clone(),
+            password_path
+                .replace(password_old_name.as_str(), password_data.name.as_str())
+                .as_str(),
+        )?;
+        delete_password(password_path)
+    } else {
+        encrypt_password(password_data, password_path)
+    }
 }
 
 pub fn delete_password(path: &str) -> Result<(), PassError> {

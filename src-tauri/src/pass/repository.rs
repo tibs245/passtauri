@@ -1,7 +1,7 @@
-use std::fs;
+use std::{fs, path::Path};
 extern crate dirs;
 use crate::pass::error::PassError;
-use gpgme::{Context, Protocol};
+use gpgme::{Context, Key, Protocol};
 
 fn get_context_openpgp_protocol() -> Result<Context, PassError> {
     match Context::from_protocol(Protocol::OpenPgp) {
@@ -14,6 +14,17 @@ fn open_password_file(password_path: &str) -> Result<fs::File, PassError> {
     match fs::File::open(password_path) {
         Ok(file) => Ok(file),
         Err(error) => Err(PassError::UnableToOpenPasswordFile(error)),
+    }
+}
+
+pub fn is_password_file_exist(password_path: &str) -> bool {
+    Path::new(password_path).exists()
+}
+
+pub fn write_password_file(password_path: &str, content: Vec<u8>) -> Result<(), PassError> {
+    match fs::write(password_path, content) {
+        Ok(()) => Ok(()),
+        Err(error) => Err(PassError::UnableToWritePasswordFile(error)),
     }
 }
 
@@ -32,6 +43,32 @@ pub fn decrypt_password_file(password_path: &str) -> Result<String, PassError> {
     match ctx.decrypt(&mut input, &mut output) {
         Ok(_result) => Ok(String::from_utf8_lossy(&output).into()),
         Err(_error) => Err(PassError::OpenPgpProtocolNotFound),
+    }
+}
+
+pub fn encrypt_string(content: String, recipients: Vec<Key>) -> Result<Vec<u8>, PassError> {
+    let mut ctx = get_context_openpgp_protocol()?;
+    let mut output = Vec::new();
+
+    match ctx.encrypt(&recipients, content, &mut output) {
+        Ok(_result) => Ok(output),
+        Err(_error) => Err(PassError::OpenPgpProtocolNotFound),
+    }
+}
+
+pub fn get_keys(reference_keys: Vec<&str>) -> Result<Vec<Key>, PassError> {
+    let mut ctx = get_context_openpgp_protocol()?;
+
+    if !reference_keys.is_empty() {
+        match ctx.find_keys(reference_keys) {
+            Ok(keys) => Ok(keys
+                .filter_map(|x| x.ok())
+                .filter(|k| k.can_encrypt())
+                .collect()),
+            Err(error) => Err(PassError::KeyNotFound(error.into())),
+        }
+    } else {
+        Ok(Vec::new())
     }
 }
 

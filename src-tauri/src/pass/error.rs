@@ -6,7 +6,10 @@ pub enum PassError {
     UnableToReadPath(String, Error),
     OpenPgpProtocolNotFound,
     UnableToOpenPasswordFile(Error),
+    UnableToWritePasswordFile(Error),
     UnableToDeletePasswordFile(Error),
+    KeyNotFound(Error),
+    PasswordFileAlreadyExists,
 }
 
 impl From<PassError> for String {
@@ -24,8 +27,17 @@ impl From<PassError> for String {
             PassError::UnableToOpenPasswordFile(error) => {
                 format!("Impossible to open password file : {}", error)
             }
+            PassError::UnableToWritePasswordFile(error) => {
+                format!("Impossible to write password file : {}", error)
+            }
             PassError::UnableToDeletePasswordFile(error) => {
-                format!("Impossible to open password file : {}", error)
+                format!("Impossible to delete password file : {}", error)
+            }
+            PassError::KeyNotFound(error) => {
+                format!("Impossible de trouver la clef : {}", error)
+            }
+            PassError::PasswordFileAlreadyExists => {
+                "Impossible create password if already exists".to_string()
             }
         }
     }

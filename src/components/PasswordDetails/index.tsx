@@ -68,8 +68,14 @@ function PasswordDetails({ passwordFile }: PasswordDetailsProps) {
             </InputGroup>
         </Box>
         <Box>
+            <Text>Username</Text>
+            <InputGroup>
+                <Input value={password?.username} isReadOnly />
+            </InputGroup>
+        </Box>
+        <Box>
             <Text>Extra information</Text>
-            <Textarea value={password?.extra} isReadOnly />
+            <Textarea value={password?.extra ?? ''} isReadOnly />
         </Box>
     </Stack>
 }

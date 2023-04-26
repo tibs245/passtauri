@@ -37,6 +37,16 @@ export default function Home() {
     setPasswordSelectionned(passwordFile);
   }
 
+  const handleUpdatePassword = (newName: string) => {
+    setIsModeEdition(false);
+    setPasswordSelectionned({
+      ...(passwordSelectionned ?? { filetype: "FILE", lastModified: "TODO anticipate problem" }),
+      filename: newName + '.gpg',
+      path: passwordSelectionned?.path.replace(passwordSelectionned.filename, newName + '.gpg') ?? ''
+    });
+  }
+
+
   return (
     <>
       <Head>
@@ -65,7 +75,7 @@ export default function Home() {
           <Box flex="1" padding={5}>
             {passwordSelectionned ?
               isModeEdition ?
-                <PasswordForm passwordFile={passwordSelectionned} onDeletePassword={() => setPasswordSelectionned(undefined)} />
+                <PasswordForm passwordFile={passwordSelectionned} onDeletePassword={() => setPasswordSelectionned(undefined)} onUpdatePassword={handleUpdatePassword} />
                 :
                 <PasswordDetails passwordFile={passwordSelectionned} onEditAsked={() => setIsModeEdition(true)} onDeletePassword={() => setPasswordSelectionned(undefined)} />
               :

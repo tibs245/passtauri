@@ -1,4 +1,4 @@
-import { useDeletePassword, usePassword } from "@/hooks/password";
+import { useDeletePassword, usePassword, useUpdatePassword } from "@/hooks/password";
 import { FileDto } from "@/types/file";
 import { Flex, FlexProps, Button, Icon, Stack, Heading, Text, Spacer, Spinner, Input, Textarea, Box, InputGroup, InputRightElement, FormControl, FormErrorMessage } from "@chakra-ui/react";
 import { FiXCircle, FiCpu, FiTrash2 } from "react-icons/fi";
@@ -9,11 +9,19 @@ import { Password } from "@/types/password";
 export type PasswordHiddenDetails = {
     passwordFile: FileDto,
     onDeletePassword?: () => void
+    onUpdatePassword?: (newName: string) => void
 }
 
-export default function PasswordHiddenDetails({ passwordFile, onDeletePassword }: PasswordHiddenDetails) {
+export default function PasswordHiddenDetails({ passwordFile, onUpdatePassword, onDeletePassword }: PasswordHiddenDetails) {
     const { data: password, isLoading, error } = usePassword(passwordFile.path)
     const { trigger, isMutating } = useDeletePassword(passwordFile.path);
+
+    const { trigger: triggerUpdatePassword, isMutating: isUpdatePasswordMutating } = useUpdatePassword(passwordFile.path);
+
+    const handleUpdatePassword = async (password: Password) => {
+        await triggerUpdatePassword(password);
+        onUpdatePassword?.(password.name)
+    }
 
     const handleDeletePassword = () => {
         trigger()
@@ -37,22 +45,22 @@ export default function PasswordHiddenDetails({ passwordFile, onDeletePassword }
             <Button leftIcon={<Icon as={FiXCircle} />} colorScheme="red" variant="ghost">Annuler</Button>
             <Button leftIcon={<Icon as={FiTrash2} />} colorScheme="red" onClick={handleDeletePassword} isLoading={isMutating}>Supprimer</Button>
         </Stack>
-        <PasswordForm passwordDetails={password} />
+        <PasswordForm passwordDetails={password} isMutating={isUpdatePasswordMutating} onSubmit={handleUpdatePassword} />
     </>
 }
 
 type PasswordFormProps = {
-    passwordDetails: Password
+    passwordDetails: Password,
+    onSubmit: SubmitHandler<Password>,
+    isMutating: boolean
 }
 
-function PasswordForm({ passwordDetails }: PasswordFormProps) {
+function PasswordForm({ passwordDetails, isMutating, onSubmit }: PasswordFormProps) {
     const { register, handleSubmit, formState: { errors } } = useForm<Password>({
         defaultValues: {
             ...passwordDetails
         }
     });
-    const onSubmit: SubmitHandler<Password> = data => console.log(data);
-
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={5}>
@@ -97,7 +105,7 @@ function PasswordForm({ passwordDetails }: PasswordFormProps) {
                 </Box>
                 <Box>
                     <Button colorScheme="red" variant="ghost">Annuler</Button>
-                    <Button colorScheme="blue" type="submit">Sauvegarder</Button>
+                    <Button colorScheme="blue" type="submit" isLoading={isMutating}>Sauvegarder</Button>
                 </Box>
             </Stack>
         </form>)

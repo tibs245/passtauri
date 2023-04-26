@@ -1,9 +1,10 @@
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
-import { TauriFetcher } from '@/hooks/config'
+import { TauriFetcher, TauriFetcherArgs } from '@/hooks/config'
 import { FileDto } from '@/types/file'
-import { Password } from '@/types/password'
+import { Password, PasswordWithPath } from '@/types/password'
 import { useSWRConfig } from "swr";
+import { ActionResult } from '@/types/actionResult'
 
 export const useListPassword = (path = "", options = {}) => useSWR<FileDto[], String>({ _key: "list_password_path", command: 'list_password_path', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path } }, TauriFetcher, options)
 
@@ -19,8 +20,44 @@ export const usePassword = (passwordPath: string | null, options = {}) => {
 export const useDeletePassword = (passwordPath: string | null, options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation(
+    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs | null>(
         passwordPath ? { command: 'delete_password', args: { passwordPath } } : null,
+        TauriFetcher,
+        {
+            onSuccess: () => {
+                mutate((key: any) => key?.command.includes("list_password_path", "search_password"),
+                    undefined,
+                    { revalidate: true }
+                )
+            },
+            ...options
+        })
+}
+
+
+export const useCreatePassword = (passwordPath: string, options = {}) => {
+    const { mutate } = useSWRConfig()
+
+    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, Password>(
+        { command: 'update_password', args: { passwordPath } },
+        TauriFetcher,
+        {
+            onSuccess: () => {
+                mutate((key: any) => key?.command.includes("list_password_path", "search_password"),
+                    undefined,
+                    { revalidate: true }
+                )
+            },
+            ...options
+        })
+}
+
+
+export const useUpdatePassword = (passwordPath: string, options = {}) => {
+    const { mutate } = useSWRConfig()
+
+    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, Password>(
+        { command: 'update_password', args: { passwordPath } },
         TauriFetcher,
         {
             onSuccess: () => {
