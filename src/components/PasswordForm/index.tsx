@@ -6,13 +6,14 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Password } from "@/types/password";
 
 
-export type PasswordHiddenDetails = {
+export type PasswordHeaderProps = {
     passwordFile: FileDto,
     onDeletePassword?: () => void
     onUpdatePassword?: (newName: string) => void
+    onCancel?: () => void
 }
 
-export default function PasswordHiddenDetails({ passwordFile, onUpdatePassword, onDeletePassword }: PasswordHiddenDetails) {
+export default function PasswordHeader({ passwordFile, onUpdatePassword, onDeletePassword, onCancel }: PasswordHeaderProps) {
     const { data: password, isLoading, error } = usePassword(passwordFile.path)
     const { trigger, isMutating } = useDeletePassword(passwordFile.path);
 
@@ -42,20 +43,21 @@ export default function PasswordHiddenDetails({ passwordFile, onUpdatePassword, 
         <Stack direction="row">
             <Heading>{passwordFile.filename}</Heading>
             <Spacer />
-            <Button leftIcon={<Icon as={FiXCircle} />} colorScheme="red" variant="ghost">Annuler</Button>
+            <Button leftIcon={<Icon as={FiXCircle} />} colorScheme="red" variant="ghost" onClick={onCancel}>Annuler</Button>
             <Button leftIcon={<Icon as={FiTrash2} />} colorScheme="red" onClick={handleDeletePassword} isLoading={isMutating}>Supprimer</Button>
         </Stack>
-        <PasswordForm passwordDetails={password} isMutating={isUpdatePasswordMutating} onSubmit={handleUpdatePassword} />
+        <PasswordForm passwordDetails={password} isMutating={isUpdatePasswordMutating} onSubmit={handleUpdatePassword} onCancel={onCancel} />
     </>
 }
 
 type PasswordFormProps = {
     passwordDetails: Password,
     onSubmit: SubmitHandler<Password>,
-    isMutating: boolean
+    isMutating: boolean,
+    onCancel?: () => void
 }
 
-function PasswordForm({ passwordDetails, isMutating, onSubmit }: PasswordFormProps) {
+function PasswordForm({ passwordDetails, isMutating, onSubmit, onCancel }: PasswordFormProps) {
     const { register, handleSubmit, formState: { errors } } = useForm<Password>({
         defaultValues: {
             ...passwordDetails
@@ -104,7 +106,7 @@ function PasswordForm({ passwordDetails, isMutating, onSubmit }: PasswordFormPro
                     <Textarea {...register("extra")} />
                 </Box>
                 <Box>
-                    <Button colorScheme="red" variant="ghost">Annuler</Button>
+                    <Button colorScheme="red" variant="ghost" onClick={onCancel}>Annuler</Button>
                     <Button colorScheme="blue" type="submit" isLoading={isMutating}>Sauvegarder</Button>
                 </Box>
             </Stack>

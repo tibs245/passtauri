@@ -75,7 +75,7 @@ export default function Home() {
           <Box flex="1" padding={5}>
             {passwordSelectionned ?
               isModeEdition ?
-                <PasswordForm passwordFile={passwordSelectionned} onDeletePassword={() => setPasswordSelectionned(undefined)} onUpdatePassword={handleUpdatePassword} />
+                <PasswordForm passwordFile={passwordSelectionned} onDeletePassword={() => setPasswordSelectionned(undefined)} onUpdatePassword={handleUpdatePassword} onCancel={() => setIsModeEdition(false)} />
                 :
                 <PasswordDetails passwordFile={passwordSelectionned} onEditAsked={() => setIsModeEdition(true)} onDeletePassword={() => setPasswordSelectionned(undefined)} />
               :
