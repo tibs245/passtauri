@@ -13,7 +13,6 @@ export type PasswordListProps = StackProps & {
 export default function PasswordList({ path, onClickFolder, onClickPassword, ...rest }: PasswordListProps) {
     const { data: listPassword, isLoading, error } = useListPassword(path.join('/'));
 
-    console.log({ listPassword })
     const handleClickFolder = (filename: string) => {
         onClickFolder?.(filename);
     }

@@ -5,62 +5,17 @@ import { FiXCircle, FiCpu, FiTrash2 } from "react-icons/fi";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Password } from "@/types/password";
 
-
-export type PasswordHeaderProps = {
-    passwordFile: FileDto,
-    onDeletePassword?: () => void
-    onUpdatePassword?: (newName: string) => void
-    onCancel?: () => void
-}
-
-export default function PasswordHeader({ passwordFile, onUpdatePassword, onDeletePassword, onCancel }: PasswordHeaderProps) {
-    const { data: password, isLoading, error } = usePassword(passwordFile.path)
-    const { trigger, isMutating } = useDeletePassword(passwordFile.path);
-
-    const { trigger: triggerUpdatePassword, isMutating: isUpdatePasswordMutating } = useUpdatePassword(passwordFile.path);
-
-    const handleUpdatePassword = async (password: Password) => {
-        await triggerUpdatePassword(password);
-        onUpdatePassword?.(password.name)
-    }
-
-    const handleDeletePassword = () => {
-        trigger()
-        onDeletePassword?.();
-    }
-
-
-    if (error) {
-        return <Text fontSize="xl">{error}</Text>
-    }
-    if (isLoading || !password) {
-        return <Flex alignItems="center" justifyContent="center" marginTop={20}>
-            <Spinner size="lg" />
-        </Flex>
-    }
-
-    return <>
-        <Stack direction="row">
-            <Heading>{passwordFile.filename}</Heading>
-            <Spacer />
-            <Button leftIcon={<Icon as={FiXCircle} />} colorScheme="red" variant="ghost" onClick={onCancel}>Annuler</Button>
-            <Button leftIcon={<Icon as={FiTrash2} />} colorScheme="red" onClick={handleDeletePassword} isLoading={isMutating}>Supprimer</Button>
-        </Stack>
-        <PasswordForm passwordDetails={password} isMutating={isUpdatePasswordMutating} onSubmit={handleUpdatePassword} onCancel={onCancel} />
-    </>
-}
-
 type PasswordFormProps = {
-    passwordDetails: Password,
+    passwordDetails?: Password,
     onSubmit: SubmitHandler<Password>,
     isMutating: boolean,
     onCancel?: () => void
 }
 
-function PasswordForm({ passwordDetails, isMutating, onSubmit, onCancel }: PasswordFormProps) {
+export default function PasswordForm({ passwordDetails, isMutating, onSubmit, onCancel }: PasswordFormProps) {
     const { register, handleSubmit, formState: { errors } } = useForm<Password>({
         defaultValues: {
-            ...passwordDetails
+            ...(passwordDetails ?? {})
         }
     });
     return (

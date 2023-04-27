@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { Box, Heading, Flex, Stack } from '@chakra-ui/react'
+import { Box, Heading, Flex, Stack, Button, Icon } from '@chakra-ui/react'
 import PasswordList from '@/components/PasswordList'
 import { useState } from 'react'
 import PassBreadcrumb from '@/components/PassBreadcrumb';
@@ -8,12 +8,15 @@ import PasswordDetails from '@/components/PasswordDetails';
 import { FileDto } from '@/types/file';
 import SearchBar from '@/components/SearchBar';
 import SearchResult from '@/components/searchResult';
-import PasswordForm from '@/components/PasswordForm';
+import PasswordEditionForm from '@/components/PasswordEditionForm';
+import { FiFilePlus, FiFolderPlus } from 'react-icons/fi';
+import PasswordCreateForm from '@/components/PasswordCreateForm ';
 
 export default function Home() {
   const [path, setPath] = useState<string[]>([]);
   const [search, setSearch] = useState<string>("");
   const [passwordSelectionned, setPasswordSelectionned] = useState<FileDto | undefined>();
+  const [isModeCreate, setIsModeCreate] = useState(false);
   const [isModeEdition, setIsModeEdition] = useState(false);
 
   const addFolderToPath = (newFolder: string) => setPath([...path, newFolder])
@@ -37,6 +40,17 @@ export default function Home() {
     setPasswordSelectionned(passwordFile);
   }
 
+  const handleCreatePassword = (passwordPath: string, name: string) => {
+    setPasswordSelectionned({
+      filetype: "FILE",
+      lastModified: "TODO anticipate problem",
+      filename: name + '.gpg',
+      path: passwordPath
+    })
+    setIsModeEdition(false);
+    setIsModeCreate(false);
+  }
+
   const handleUpdatePassword = (newName: string) => {
     setIsModeEdition(false);
     setPasswordSelectionned({
@@ -45,7 +59,6 @@ export default function Home() {
       path: passwordSelectionned?.path.replace(passwordSelectionned.filename, newName + '.gpg') ?? ''
     });
   }
-
 
   return (
     <>
@@ -64,7 +77,11 @@ export default function Home() {
           </Stack>
         </Flex>
         <Flex minHeight="calc(100vh - 5em)">
-          <Box overflowY="scroll" maxHeight="calc(100vh - 5em)" minWidth="20em" maxWidth="20vw" borderRightColor="grau.400" borderRightWidth="1px">
+          <Box overflowY="scroll" maxHeight="calc(100vh - 5em)" minWidth="20em" maxWidth="20vw" borderRightColor="gray.200" borderRightWidth="1px">
+            <Flex>
+              <Button colorScheme='blue' leftIcon={<Icon as={FiFolderPlus} />} isDisabled flex="1" rounded={0}>Add Folder</Button>
+              <Button colorScheme='green' leftIcon={<Icon as={FiFilePlus} />} flex="1" onClick={() => setIsModeCreate(true)} rounded={0}>Add Password</Button>
+            </Flex>
             <SearchBar onSearch={setSearch} />
             {search === "" ?
               <PasswordList path={path} onClickFolder={addFolderToPath} onClickPassword={handleClickPassword} />
@@ -73,13 +90,16 @@ export default function Home() {
             }
           </Box>
           <Box flex="1" padding={5}>
-            {passwordSelectionned ?
-              isModeEdition ?
-                <PasswordForm passwordFile={passwordSelectionned} onDeletePassword={() => setPasswordSelectionned(undefined)} onUpdatePassword={handleUpdatePassword} onCancel={() => setIsModeEdition(false)} />
-                :
-                <PasswordDetails passwordFile={passwordSelectionned} onEditAsked={() => setIsModeEdition(true)} onDeletePassword={() => setPasswordSelectionned(undefined)} />
+            {isModeCreate ?
+              <PasswordCreateForm defaultPath={path.join('/')} onCreatePassword={handleCreatePassword} onCancel={() => { setIsModeEdition(false); setIsModeCreate(false) }} />
               :
-              <NoSelectedPassword />}
+              passwordSelectionned ?
+                isModeEdition ?
+                  <PasswordEditionForm passwordFile={passwordSelectionned} onDeletePassword={() => setPasswordSelectionned(undefined)} onUpdatePassword={handleUpdatePassword} onCancel={() => setIsModeEdition(false)} />
+                  :
+                  <PasswordDetails passwordFile={passwordSelectionned} onEditAsked={() => setIsModeEdition(true)} onDeletePassword={() => setPasswordSelectionned(undefined)} />
+                :
+                <NoSelectedPassword />}
           </Box>
         </Flex>
       </main >

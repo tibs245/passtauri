@@ -35,11 +35,11 @@ export const useDeletePassword = (passwordPath: string | null, options = {}) => 
 }
 
 
-export const useCreatePassword = (passwordPath: string, options = {}) => {
+export const useCreatePassword = (options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, Password>(
-        { command: 'update_password', args: { passwordPath } },
+    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, PasswordWithPath>(
+        { command: 'create_password', args: {} },
         TauriFetcher,
         {
             onSuccess: () => {

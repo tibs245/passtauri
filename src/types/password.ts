@@ -7,3 +7,7 @@ export type Password = {
     lastUpdated: string;
     extra: string;
 }
+
+export type PasswordWithPath = Password & {
+    passwordPath: string
+}
