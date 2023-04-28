@@ -37,6 +37,7 @@ export default function Home() {
 
   const handleClickPassword = (passwordFile: FileDto) => {
     setIsModeEdition(false);
+    setIsModeCreate(false);
     setPasswordSelectionned(passwordFile);
   }
 
