@@ -69,3 +69,15 @@ export const useUpdatePassword = (passwordPath: string, options = {}) => {
             ...options
         })
 }
+
+export type GeneratePasswordParam = {
+    size: number;
+    listOfCaractere: string;
+}
+
+export const useGeneratePassword = (options = {}) => {
+    return useSWRMutation<string, string, TauriFetcherArgs, GeneratePasswordParam>(
+        { command: 'generate_password', args: {} },
+        TauriFetcher,
+        options)
+}

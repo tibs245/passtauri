@@ -69,7 +69,7 @@ impl From<PasswordData> for String {
         };
 
         match password_data.username {
-            Some(username) => data_to_stringify.push(format!("username: {}", username)),
+            Some(username) => data_to_stringify.push(format!("username:{}", username)),
             _ => (),
         };
 

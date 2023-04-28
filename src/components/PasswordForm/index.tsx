@@ -1,9 +1,8 @@
-import { useDeletePassword, usePassword, useUpdatePassword } from "@/hooks/password";
-import { FileDto } from "@/types/file";
-import { Flex, FlexProps, Button, Icon, Stack, Heading, Text, Spacer, Spinner, Input, Textarea, Box, InputGroup, InputRightElement, FormControl, FormErrorMessage } from "@chakra-ui/react";
-import { FiXCircle, FiCpu, FiTrash2 } from "react-icons/fi";
+import { Button, Icon, Stack, Text, Input, Textarea, Box, InputGroup, InputRightElement, FormControl, FormErrorMessage, useDisclosure } from "@chakra-ui/react";
+import { FiCpu } from "react-icons/fi";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Password } from "@/types/password";
+import GenerateNewPasswordModal from "@/components/GenerateNewPasswordModal";
 
 type PasswordFormProps = {
     passwordDetails?: Password,
@@ -13,12 +12,20 @@ type PasswordFormProps = {
 }
 
 export default function PasswordForm({ passwordDetails, isMutating, onSubmit, onCancel }: PasswordFormProps) {
-    const { register, handleSubmit, formState: { errors } } = useForm<Password>({
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm<Password>({
         defaultValues: {
             ...(passwordDetails ?? {})
         }
     });
-    return (
+
+    const handleApplyPassword = (password: string) => {
+        setValue('password', password);
+        onClose()
+    }
+
+    return (<>
+        <GenerateNewPasswordModal isOpen={isOpen} onClose={onClose} onApplyPassword={handleApplyPassword} />
         <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={5}>
                 <Box>
@@ -37,7 +44,7 @@ export default function PasswordForm({ passwordDetails, isMutating, onSubmit, on
                     <FormControl isInvalid={!!errors.password}>
                         <InputGroup>
                             <Input {...register("password", { required: "A password is required to save it" })} />
-                            <InputRightElement><Icon as={FiCpu} /></InputRightElement>
+                            <InputRightElement><Icon as={FiCpu} onClick={onOpen} cursor="pointer" /></InputRightElement>
                         </InputGroup>
                         <FormErrorMessage>
                             {errors.password && errors.password.message}
@@ -65,5 +72,6 @@ export default function PasswordForm({ passwordDetails, isMutating, onSubmit, on
                     <Button colorScheme="blue" type="submit" isLoading={isMutating}>Sauvegarder</Button>
                 </Box>
             </Stack>
-        </form>)
+        </form>
+    </>)
 }

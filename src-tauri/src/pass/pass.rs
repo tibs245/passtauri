@@ -19,6 +19,7 @@ pub fn generate_password(list_of_caractere: &str, size: usize) -> Result<String,
     }
 }
 
+#[tauri::command]
 pub fn create_password(
     password_path: &str,
     name: &str,
