@@ -9,5 +9,5 @@ export const TauriFetcher = <T>({ command, args }: TauriFetcherArgs, argsMutatio
 
     console.log({ invoke: command, args, argsMutation: argsMutation?.arg })
     const argMut = argsMutation?.arg as Object
-    return invoke<string>(command, { ...args, ...argMut }).then(v => JSON.parse(v))
+    return invoke<T>(command, { ...args, ...argMut })
 }

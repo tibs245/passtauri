@@ -51,6 +51,7 @@ const baseStyle: PartsStyleFunction<typeof parts> = (props) => ({
   closeButton: baseStyleCloseButton,
 });
 
+/* eslint-disable import/no-anonymous-default-export */
 export default {
   parts: parts.keys,
   baseStyle,

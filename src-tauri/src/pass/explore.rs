@@ -1,25 +1,18 @@
 use crate::pass::service;
 
+use super::{entities::file_details::FileDetails, error::PassError};
+
 #[tauri::command]
-pub fn list_password() -> Result<String, String> {
-    match serde_json::to_string(&service::list_password_path("")?) {
-        Ok(result) => Ok(result),
-        Err(error) => Err(error.to_string()),
-    }
+pub fn list_password() -> Result<Vec<FileDetails>, PassError> {
+    service::list_password_path("")
 }
 
 #[tauri::command]
-pub fn list_password_path(path: &str) -> Result<String, String> {
-    match serde_json::to_string(&service::list_password_path(path)?) {
-        Ok(result) => Ok(result),
-        Err(error) => Err(error.to_string()),
-    }
+pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
+    service::list_password_path(path)
 }
 
 #[tauri::command]
-pub fn search_password(path: &str, search: &str) -> Result<String, String> {
-    match serde_json::to_string(&service::search_password(path, search)?) {
-        Ok(result) => Ok(result),
-        Err(error) => Err(error.to_string()),
-    }
+pub fn search_password(path: &str, search: &str) -> Result<Option<Vec<FileDetails>>, PassError> {
+    service::search_password(path, search)
 }

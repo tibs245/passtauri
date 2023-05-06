@@ -1,5 +1,7 @@
 use std::io::Error;
 
+use serde::{ser::SerializeStruct, Serialize, Serializer};
+
 #[derive(Debug)]
 pub enum PassError {
     PasswordStorePathNotFound,
@@ -11,9 +13,8 @@ pub enum PassError {
     KeyNotFound(Error),
     PasswordFileAlreadyExists,
 }
-
-impl From<PassError> for String {
-    fn from(pass_error: PassError) -> String {
+impl From<&PassError> for String {
+    fn from(pass_error: &PassError) -> String {
         match pass_error {
             PassError::PasswordStorePathNotFound => {
                 "Password store path not configured or not found".to_string()
@@ -40,5 +41,23 @@ impl From<PassError> for String {
                 "Impossible create password if already exists".to_string()
             }
         }
+    }
+}
+
+impl From<PassError> for String {
+    fn from(pass_error: PassError) -> String {
+        String::from(&pass_error)
+    }
+}
+
+impl Serialize for PassError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut s = serializer.serialize_struct("PassError", 2)?;
+        s.serialize_field("errorType", &format!("{:?}", self))?;
+        s.serialize_field("message", &String::from(self))?;
+        s.end()
     }
 }

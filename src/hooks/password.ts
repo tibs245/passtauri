@@ -5,13 +5,15 @@ import { FileDto } from '@/types/file'
 import { Password, PasswordWithPath } from '@/types/password'
 import { useSWRConfig } from "swr";
 import { ActionResult } from '@/types/actionResult'
+import { TauriError } from '@/types/tauriError'
+import { Key } from '@/types/key'
 
-export const useListPassword = (path = "", options = {}) => useSWR<FileDto[], String>({ _key: "list_password_path", command: 'list_password_path', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path } }, TauriFetcher, options)
+export const useListPassword = (path = "", options = {}) => useSWR<FileDto[], TauriError>({ _key: "list_password_path", command: 'list_password_path', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path } }, TauriFetcher, options)
 
-export const useSearchPassword = (path = "", search = "", options = {}) => useSWR<FileDto[], String>({ _key: "search_password", command: 'search_password', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path, search } }, TauriFetcher, options)
+export const useSearchPassword = (path = "", search = "", options = {}) => useSWR<FileDto[], TauriError>({ _key: "search_password", command: 'search_password', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path, search } }, TauriFetcher, options)
 
 export const usePassword = (passwordPath: string | null, options = {}) => {
-    return useSWR<Password, String>(
+    return useSWR<Password, TauriError>(
         passwordPath ? { _key: "read_password", command: 'read_password', args: { passwordPath } } : null,
         TauriFetcher,
         { revalidateIfStale: false, revalidateOnMount: true, revalidateOnFocus: false, revalidateOnReconnect: false, ...options })
@@ -81,3 +83,6 @@ export const useGeneratePassword = (options = {}) => {
         TauriFetcher,
         options)
 }
+
+
+export const useKeys = (options = {}) => useSWR<Key, TauriError>({ _key: "get_all_keys", command: 'get_all_keys', args: {} }, TauriFetcher, options)

@@ -47,9 +47,10 @@ type PasswordDetailsProps = Omit<PasswordHiddenDetails, 'onEditAsked' | 'onDelet
 
 function PasswordDetails({ passwordFile }: PasswordDetailsProps) {
     const { data: password, isLoading, error } = usePassword(passwordFile.path)
+    console.log({ password, error })
 
     if (error) {
-        return <Text fontSize="xl">{error}</Text>
+        return <Text fontSize="xl">{error?.message}</Text>
     }
     if (isLoading) {
         return <Flex alignItems="center" justifyContent="center" marginTop={20}>

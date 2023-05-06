@@ -93,7 +93,7 @@ export default function GenerateNewPasswordModal({ isOpen, onClose, onApplyPassw
                                 <SliderTrack >
                                     <SliderFilledTrack {...register('size')} />
                                 </SliderTrack>
-                                <SliderThumb fontSize='sm' boxSize='32px' children={size} />
+                                <SliderThumb fontSize='sm' boxSize='32px'>{size}</SliderThumb>
                             </Slider>
                             <Box>
                                 <Stack direction="row">

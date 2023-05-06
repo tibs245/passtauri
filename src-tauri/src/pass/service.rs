@@ -1,3 +1,4 @@
+use gpgme::Key;
 use rand::Rng;
 
 use crate::pass::entities::file_details::FileDetails;
@@ -55,6 +56,10 @@ pub fn generate_string(list_of_caractere: &str, size: usize) -> String {
             charset[idx] as char
         })
         .collect()
+}
+
+pub fn get_all_keys() -> Result<Vec<Key>, PassError> {
+    repository::get_all_keys()
 }
 
 fn encrypt_password(password_data: PasswordData, password_path: &str) -> Result<(), PassError> {

@@ -1,10 +1,10 @@
 import {
   StyleFunctionProps,
   SystemStyleInterpolation,
-  isAccessible,
   mode,
-  transparentize,
 } from '@chakra-ui/theme-tools';
+
+import { isAccessible, transparentize } from '@/theme/utils'
 
 type customVariantOptions = {
   theme: StyleFunctionProps['theme'];
@@ -98,7 +98,7 @@ const variants: Record<string, SystemStyleInterpolation> = {
     },
   }),
 };
-
+/* eslint-disable import/no-anonymous-default-export */
 export default {
   variants,
 };

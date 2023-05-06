@@ -1,8 +1,8 @@
 import {
   SystemStyleInterpolation,
-  getColor,
   mode,
 } from '@chakra-ui/theme-tools';
+import { getColor } from '@/theme/utils'
 
 const variants: Record<string, SystemStyleInterpolation> = {
   outline: (props) => {
@@ -23,6 +23,7 @@ const variants: Record<string, SystemStyleInterpolation> = {
   },
 };
 
+/* eslint-disable import/no-anonymous-default-export */
 export default {
   variants,
 };

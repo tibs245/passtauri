@@ -17,6 +17,7 @@ fn main() {
             pass::pass::delete_password,
             pass::pass::create_password,
             pass::pass::update_password,
+            pass::pass::get_all_keys,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

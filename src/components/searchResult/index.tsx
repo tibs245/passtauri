@@ -23,11 +23,11 @@ export default function SearchResult({ path, searchWord, onClickFolder, onClickP
     }
 
     if (error) {
-        return <Text>{error}</Text>
+        return <Text>{error.message}</Text>
     }
 
     if (isLoading) {
-        return <Text>"Read secret folder 🫣 .."</Text>
+        return <Text>Read secret folder 🫣 ..</Text>
     }
 
     return <Stack

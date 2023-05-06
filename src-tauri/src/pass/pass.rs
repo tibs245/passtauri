@@ -1,22 +1,19 @@
 use super::{
-    entities::{action_result::ActionResult, password_data::PasswordData},
+    entities::{
+        action_result::ActionResult, key_serializable::KeySerializable, password_data::PasswordData,
+    },
+    error::PassError,
     service,
 };
 
 #[tauri::command]
-pub fn read_password(password_path: &str) -> Result<String, String> {
-    match serde_json::to_string(&service::get_password_data(password_path)?) {
-        Ok(result) => Ok(result),
-        Err(error) => Err(error.to_string()),
-    }
+pub fn read_password(password_path: &str) -> Result<PasswordData, PassError> {
+    service::get_password_data(password_path)
 }
 
 #[tauri::command]
-pub fn generate_password(list_of_caractere: &str, size: usize) -> Result<String, String> {
-    match serde_json::to_string(&service::generate_string(list_of_caractere, size)) {
-        Ok(result) => Ok(result),
-        Err(error) => Err(error.to_string()),
-    }
+pub fn generate_password(list_of_caractere: &str, size: usize) -> String {
+    service::generate_string(list_of_caractere, size)
 }
 
 #[tauri::command]
@@ -27,7 +24,7 @@ pub fn create_password(
     username: Option<&str>,
     otp: Option<&str>,
     extra: Option<&str>,
-) -> Result<(), String> {
+) -> Result<(), PassError> {
     let password_data = PasswordData {
         name: name.to_string(),
         password: password.to_string(),
@@ -45,10 +42,7 @@ pub fn create_password(
         },
     };
 
-    match service::create_password(password_data, password_path) {
-        Ok(()) => Ok(()),
-        Err(error) => Err(error.into()),
-    }
+    service::create_password(password_data, password_path)
 }
 
 #[tauri::command]
@@ -59,7 +53,7 @@ pub fn update_password(
     username: Option<&str>,
     otp: Option<&str>,
     extra: Option<&str>,
-) -> Result<(), String> {
+) -> Result<(), PassError> {
     let password_data = PasswordData {
         name: name.to_string(),
         password: password.to_string(),
@@ -77,24 +71,27 @@ pub fn update_password(
         },
     };
 
-    match service::update_password(password_data, password_path) {
-        Ok(()) => Ok(()),
-        Err(error) => Err(error.into()),
+    service::update_password(password_data, password_path)
+}
+
+#[tauri::command]
+pub fn delete_password(password_path: &str) -> Result<ActionResult, ActionResult> {
+    match service::delete_password(password_path) {
+        Ok(()) => Ok(ActionResult {
+            result: true,
+            error: None,
+        }),
+        Err(error) => Err(ActionResult {
+            result: false,
+            error: Some(error.into()),
+        }),
     }
 }
 
 #[tauri::command]
-pub fn delete_password(password_path: &str) -> Result<String, String> {
-    match service::delete_password(password_path) {
-        Ok(()) => Ok(serde_json::to_string(&ActionResult {
-            result: true,
-            error: None,
-        })
-        .unwrap()),
-        Err(error) => Err(serde_json::to_string(&ActionResult {
-            result: false,
-            error: Some(error.into()),
-        })
-        .unwrap()),
+pub fn get_all_keys<'a>() -> Result<Vec<KeySerializable>, PassError> {
+    match service::get_all_keys() {
+        Ok(keys) => Ok(keys.iter().map(KeySerializable::from).collect()),
+        Err(error) => Err(error),
     }
 }

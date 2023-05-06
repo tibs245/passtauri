@@ -72,6 +72,16 @@ pub fn get_keys(reference_keys: Vec<&str>) -> Result<Vec<Key>, PassError> {
     }
 }
 
+pub fn get_all_keys() -> Result<Vec<Key>, PassError> {
+    let mut ctx = get_context_openpgp_protocol()?;
+
+    let result = match ctx.keys() {
+        Ok(keys) => Ok(keys.filter_map(|x| x.ok()).collect()),
+        Err(error) => Err(PassError::KeyNotFound(error.into())),
+    };
+    result
+}
+
 pub fn password_store_path() -> Result<String, PassError> {
     match dirs::home_dir() {
         Some(path) => Ok(path.to_string_lossy().into_owned() + &"/.password-store/"),

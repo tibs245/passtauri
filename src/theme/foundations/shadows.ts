@@ -1,4 +1,4 @@
-import { transparentize } from '@chakra-ui/theme-tools';
+import { transparentize } from '@/theme/utils';
 
 import { colors } from './colors';
 

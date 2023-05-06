@@ -21,11 +21,11 @@ export default function PasswordList({ path, onClickFolder, onClickPassword, ...
     }
 
     if (error) {
-        return <>{error}</>
+        return <>{error.message}</>
     }
 
     if (isLoading) {
-        return <Text>"Read secret folder 🫣 .."</Text>
+        return <Text>Read secret folder 🫣 ..</Text>
     }
 
     return <Stack

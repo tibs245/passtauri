@@ -1,5 +1,6 @@
 import { alertAnatomy as parts } from '@chakra-ui/anatomy';
-import { getColor, mode, transparentize } from '@chakra-ui/theme-tools';
+import { mode } from '@chakra-ui/theme-tools';
+import { getColor, transparentize } from '@/theme/utils'
 import type {
   PartsStyleFunction,
   PartsStyleObject,
@@ -115,6 +116,7 @@ const defaultProps = {
   colorScheme: 'blue',
 };
 
+/* eslint-disable import/no-anonymous-default-export */
 export default {
   parts: parts.keys,
   baseStyle,

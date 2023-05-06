@@ -96,6 +96,7 @@ const defaultProps = {
   size: 'md',
 };
 
+/* eslint-disable import/no-anonymous-default-export */
 export default {
   parts: parts.keys,
   baseStyle,

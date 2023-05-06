@@ -25,6 +25,7 @@ const variants: Record<string, SystemStyleInterpolation> = {
   },
 };
 
+/* eslint-disable import/no-anonymous-default-export */
 export default {
   variants,
 };

@@ -30,7 +30,7 @@ export default function PasswordEditionForm({ passwordFile, onUpdatePassword, on
 
 
     if (error) {
-        return <Text fontSize="xl">{error}</Text>
+        return <Text fontSize="xl">{error.message}</Text>
     }
     if (isLoading || !password) {
         return <Flex alignItems="center" justifyContent="center" marginTop={20}>
