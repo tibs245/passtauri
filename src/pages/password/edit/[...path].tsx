@@ -9,7 +9,7 @@ import Link from "next/link"
 
 export default function PasswordEditionForm() {
     const router = useRouter();
-    const passwordQuery = router.query.path as string[] ?? [];
+    const passwordQuery = useMemo(() => router.query.path as string[] ?? [], [router.query.path]);
 
     const filename = useMemo(() => passwordQuery[passwordQuery.length - 1]?.replace('.gpg', ''), [passwordQuery])
     const passwordPath = useMemo(() => '/' + passwordQuery.join('/'), [passwordQuery])

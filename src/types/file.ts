@@ -3,4 +3,5 @@ export type FileDto = {
     path: string;
     filetype: "FILE" | "DIRECTORY";
     lastModified: string;
+    encryptKeysId: string[];
 }

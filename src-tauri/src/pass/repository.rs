@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{fs, io::Read, path::Path};
 extern crate dirs;
 use crate::pass::error::PassError;
 use gpgme::{Context, Key, Protocol};
@@ -10,14 +10,14 @@ fn get_context_openpgp_protocol() -> Result<Context, PassError> {
     }
 }
 
-fn open_password_file(password_path: &str) -> Result<fs::File, PassError> {
+fn open_file(password_path: &str) -> Result<fs::File, PassError> {
     match fs::File::open(password_path) {
         Ok(file) => Ok(file),
-        Err(error) => Err(PassError::UnableToOpenPasswordFile(error)),
+        Err(error) => Err(PassError::UnableToOpenFile(error)),
     }
 }
 
-pub fn is_password_file_exist(password_path: &str) -> bool {
+pub fn is_file_exist(password_path: &str) -> bool {
     Path::new(password_path).exists()
 }
 
@@ -37,7 +37,7 @@ pub fn delete_password_file(password_path: &str) -> Result<(), PassError> {
 
 pub fn decrypt_password_file(password_path: &str) -> Result<String, PassError> {
     let mut ctx = get_context_openpgp_protocol()?;
-    let mut input = open_password_file(password_path)?;
+    let mut input = open_file(password_path)?;
     let mut output = Vec::new();
 
     match ctx.decrypt(&mut input, &mut output) {
@@ -82,9 +82,23 @@ pub fn get_all_keys() -> Result<Vec<Key>, PassError> {
     result
 }
 
+pub fn get_gpg_id_from_path(gpg_id_path: &str) -> Result<Vec<String>, PassError> {
+    let mut file = open_file(gpg_id_path)?;
+    let mut contents = String::new();
+
+    match file.read_to_string(&mut contents) {
+        Ok(_) => Ok(contents
+            .split('\n')
+            .filter(|content| content.len() != 0)
+            .map(String::from)
+            .collect()),
+        Err(error) => Err(PassError::EnableParseContentToString(error)),
+    }
+}
+
 pub fn password_store_path() -> Result<String, PassError> {
     match dirs::home_dir() {
-        Some(path) => Ok(path.to_string_lossy().into_owned() + &"/.password-store/"),
+        Some(path) => Ok(path.to_string_lossy().into_owned() + &"/.password-store"),
         None => Err(PassError::PasswordStorePathNotFound),
     }
 }

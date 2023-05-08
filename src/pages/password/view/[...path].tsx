@@ -10,13 +10,13 @@ import { FiEdit, FiEye, FiShield, FiTrash2 } from "react-icons/fi";
 
 export default function PasswordViewDetailsPage() {
     const router = useRouter();
-    const password = router.query.path as string[] ?? [];
+    const password = useMemo(() => router.query.path as string[] ?? [], [router.query.path]);
 
     const [lastPasswordUnlocked, setLastPasswordUnlocked] = useState<undefined | string>();
 
     const filename = useMemo(() => password[password.length - 1]?.replace('.gpg', ''), [password])
     const passwordPath = useMemo(() => '/' + password.join('/'), [password])
-    const isUnlocked = useMemo(() => lastPasswordUnlocked === passwordPath, [password, lastPasswordUnlocked])
+    const isUnlocked = useMemo(() => lastPasswordUnlocked === passwordPath, [passwordPath, lastPasswordUnlocked])
 
     const { trigger, isMutating } = useDeletePassword(passwordPath);
 
@@ -39,7 +39,7 @@ export default function PasswordViewDetailsPage() {
                 :
                 <Flex alignItems="center" justifyContent="center" marginTop={20}>
                     <Stack>
-                        <Icon as={FiShield} boxSize="3xs" margin="auto" />
+                        <Icon as={FiShield} color="brand.800" fill="gray.300" boxSize="3xs" margin="auto" />
                         <Button leftIcon={<Icon as={FiEye} fill="white" fillOpacity={0.15} />} colorScheme="brand" size="lg" onClick={() => setLastPasswordUnlocked(passwordPath)}>
                             Déchiffrer les données
                         </Button>

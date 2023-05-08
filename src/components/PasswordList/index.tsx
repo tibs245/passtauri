@@ -1,6 +1,7 @@
 import FolderItem from "@/components/FolderItem";
 import PasswordItem from "@/components/PasswordItem";
 import { useListPassword } from "@/hooks/password";
+import { FileDto } from "@/types/file";
 import { Stack, StackDivider, StackProps, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
@@ -13,8 +14,8 @@ export default function PasswordList({ path, onClickFolder, ...rest }: PasswordL
     const router = useRouter();
     const { data: listPassword, isLoading, error } = useListPassword(path.join('/'));
 
-    const handleClickFolder = (filename: string) => {
-        onClickFolder?.(filename);
+    const handleClickFolder = (filedto: FileDto) => {
+        onClickFolder?.(filedto.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', ''));
     }
 
     if (error) {
@@ -29,14 +30,15 @@ export default function PasswordList({ path, onClickFolder, ...rest }: PasswordL
         spacing={0}
         divider={<StackDivider borderColor='gray.200' />}
         {...rest}>
-        {listPassword?.map(password => password.filetype === "DIRECTORY" ?
-            <FolderItem key={password.filename}
+        {listPassword?.map(fileItem => fileItem.filetype === "DIRECTORY" ?
+            <FolderItem key={fileItem.filename}
                 _hover={{ backgroundColor: 'gray.100' }}
-                onClick={() => handleClickFolder(password.filename)}
-            >{password.filename}</FolderItem> :
-            <PasswordItem key={password.filename}
+                keys={fileItem.encryptKeysId}
+                onClick={() => handleClickFolder(fileItem)}
+            >{fileItem.filename}</FolderItem> :
+            <PasswordItem key={fileItem.filename}
                 _hover={{ backgroundColor: 'gray.100' }}
-                onClick={() => router.push(`/password/view${password.path}`)}>
-                {password.filename}</PasswordItem>)}
+                onClick={() => router.push(`/password/view${fileItem.path}`)}>
+                {fileItem.filename}</PasswordItem>)}
     </Stack>
 }

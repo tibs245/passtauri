@@ -7,11 +7,13 @@ pub enum PassError {
     PasswordStorePathNotFound,
     UnableToReadPath(String, Error),
     OpenPgpProtocolNotFound,
-    UnableToOpenPasswordFile(Error),
+    UnableToOpenFile(Error),
     UnableToWritePasswordFile(Error),
     UnableToDeletePasswordFile(Error),
     KeyNotFound(Error),
     PasswordFileAlreadyExists,
+    EnableParseContentToString(Error),
+    PathNotInPasswordStorePath,
 }
 impl From<&PassError> for String {
     fn from(pass_error: &PassError) -> String {
@@ -25,7 +27,7 @@ impl From<&PassError> for String {
             PassError::OpenPgpProtocolNotFound => {
                 "Impossible use Openpgp protocol : It's installed ?".to_string()
             }
-            PassError::UnableToOpenPasswordFile(error) => {
+            PassError::UnableToOpenFile(error) => {
                 format!("Impossible to open password file : {}", error)
             }
             PassError::UnableToWritePasswordFile(error) => {
@@ -39,6 +41,12 @@ impl From<&PassError> for String {
             }
             PassError::PasswordFileAlreadyExists => {
                 "Impossible create password if already exists".to_string()
+            }
+            PassError::EnableParseContentToString(error) => {
+                format!("Enable to parse content to string : {}", error)
+            }
+            PassError::PathNotInPasswordStorePath => {
+                "Path is not in password-store path".to_string()
             }
         }
     }

@@ -7,16 +7,11 @@ import PasswordList from '@/components/PasswordList'
 import PassBreadcrumb from '@/components/PassBreadcrumb';
 import SearchBar from '@/components/SearchBar';
 import SearchResult from '@/components/SearchResult';
-import { FiFilePlus, FiFolderPlus, FiSettings } from 'react-icons/fi';
+import { FiFilePlus, FiFolderPlus, FiSettings, FiShield } from 'react-icons/fi';
 import { useState } from 'react';
 import Link from 'next/link';
-import { useKeys } from '@/hooks/password';
 
 export default function App({ Component, pageProps }: AppProps) {
-  const { data } = useKeys();
-  console.log({ data })
-
-
   const [path, setPath] = useState<string[]>([]);
   const [search, setSearch] = useState<string>("");
 
@@ -41,8 +36,12 @@ export default function App({ Component, pageProps }: AppProps) {
     <main style={{ height: "100vh" }}>
       <Flex as="header" bgColor="gray.200" height="5em" alignItems="center" padding={9}>
         <Stack>
-          <Heading as="h1" fontSize="2xl">PassTauri</Heading>
-
+          <Link href="/">
+            <Heading as="h1" fontSize="2xl">
+              <Icon as={FiShield} color="brand.800" fill="brand.800" fontSize="3xl" verticalAlign="text-bottom" mr={2} />
+              PassTauri
+            </Heading>
+          </Link>
           <PassBreadcrumb path={path} onClickFolder={goBackToFolder} />
         </Stack>
         <Spacer />

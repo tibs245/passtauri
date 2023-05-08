@@ -36,6 +36,7 @@ pub struct FileDetails {
     pub path: String,
     pub filetype: FileTypeAPI,
     pub last_modified: SystemTime,
+    pub encrypt_keys_id: Option<Vec<String>>,
 }
 
 impl FileDetails {
@@ -54,6 +55,7 @@ impl From<&DirEntry> for FileDetails {
                 Ok(value) => value,
                 Err(_) => SystemTime::UNIX_EPOCH,
             },
+            encrypt_keys_id: None,
         }
     }
 }
@@ -71,11 +73,12 @@ impl Serialize for FileDetails {
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("FileDetails", 4)?;
+        let mut s = serializer.serialize_struct("FileDetails", 5)?;
         s.serialize_field("filename", &self.filename)?;
         s.serialize_field("path", &self.path)?;
         s.serialize_field("filetype", &String::from(self.filetype.clone()))?;
         s.serialize_field("lastModified", &utils::iso8601(&self.last_modified))?;
+        s.serialize_field("encryptKeysId", &self.encrypt_keys_id)?;
         s.end()
     }
 }

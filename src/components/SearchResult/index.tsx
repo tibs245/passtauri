@@ -36,6 +36,7 @@ export default function SearchResult({ path, searchWord, onClickFolder, ...rest 
             <FolderItem key={password.filename}
                 _hover={{ backgroundColor: 'gray.100' }}
                 onClick={() => handleClickFolder(password)}
+                keys={password.encryptKeysId}
             >
                 <Stack spacing={0}>
                     <Text fontSize="xs" color="gray.600">{password.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', '').replace(password?.filename ?? '', '')}</Text>

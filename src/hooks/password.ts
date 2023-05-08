@@ -8,9 +8,17 @@ import { ActionResult } from '@/types/actionResult'
 import { TauriError } from '@/types/tauriError'
 import { Key } from '@/types/key'
 
-export const useListPassword = (path = "", options = {}) => useSWR<FileDto[], TauriError>({ _key: "list_password_path", command: 'list_password_path', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path } }, TauriFetcher, options)
+export const useListPassword = (path = "", options = {}) => useSWR<FileDto[], TauriError>(
+        { _key: "list_password_path", command: 'list_password_path', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path } },
+        TauriFetcher,
+        options
+    )
 
-export const useSearchPassword = (path = "", search = "", options = {}) => useSWR<FileDto[], TauriError>({ _key: "search_password", command: 'search_password', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path, search } }, TauriFetcher, options)
+export const useSearchPassword = (path = "", search = "", options = {}) => useSWR<FileDto[], TauriError>(
+        { _key: "search_password", command: 'search_password', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path, search } },
+        TauriFetcher,
+        options
+    )
 
 export const usePassword = (passwordPath: string | null, options = {}) => {
     return useSWR<Password, TauriError>(
@@ -85,4 +93,8 @@ export const useGeneratePassword = (options = {}) => {
 }
 
 
-export const useKeys = (options = {}) => useSWR<Key, TauriError>({ _key: "get_all_keys", command: 'get_all_keys', args: {} }, TauriFetcher, options)
+export const useKeys = (options = {}) => useSWR<Key[], TauriError>(
+        { _key: "get_all_keys", command: 'get_all_keys', args: {} },
+        TauriFetcher,
+        options
+    )

@@ -1,14 +1,14 @@
 use gpgme::Key;
 use rand::Rng;
 
-use crate::pass::entities::file_details::FileDetails;
 use crate::pass::entities::password_data::PasswordData;
+use crate::{pass::entities::file_details::FileDetails, utils::remove_last_dir};
 
 use crate::pass::error::PassError;
 
 use super::repository::{
-    self, decrypt_password_file, delete_password_file, is_password_file_exist, list_files_path,
-    search_files,
+    self, decrypt_password_file, delete_password_file, get_gpg_id_from_path, is_file_exist,
+    list_files_path, password_store_path, search_files,
 };
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
@@ -25,9 +25,45 @@ pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError>
     })
 }
 
+pub fn folder_gpg_id_or_parents(path: &str) -> Result<Option<Vec<String>>, PassError> {
+    let store_path = password_store_path()?;
+
+    if !path.contains(&store_path) {
+        return Err(PassError::PathNotInPasswordStorePath);
+    }
+
+    match folder_gpg_id(path)? {
+        Some(keys) => Ok(Some(keys)),
+        None => match folder_gpg_id_or_parents(&remove_last_dir(path)) {
+            Ok(result) => Ok(result),
+            Err(error) => match error {
+                PassError::PathNotInPasswordStorePath => Ok(None),
+                _ => Err(error),
+            },
+        },
+    }
+}
+
+pub fn folder_gpg_id(path: &str) -> Result<Option<Vec<String>>, PassError> {
+    let gpg_id_path = path.to_owned() + "/.gpg-id";
+
+    if is_file_exist(&gpg_id_path) {
+        Ok(Some(get_gpg_id_from_path(&gpg_id_path)?))
+    } else {
+        Ok(None)
+    }
+}
+
 pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
     Ok(list_files_path(path)?
-        .map(|f| -> FileDetails { f.unwrap().into() })
+        .map(|file| -> FileDetails {
+            let file_unwraped = file.unwrap();
+            FileDetails {
+                encrypt_keys_id: folder_gpg_id_or_parents(file_unwraped.path().to_str().unwrap())
+                    .unwrap_or(None),
+                ..file_unwraped.into()
+            }
+        })
         .filter(|file| !file.is_cached_dir())
         .collect())
 }
@@ -69,7 +105,7 @@ fn encrypt_password(password_data: PasswordData, password_path: &str) -> Result<
 }
 
 pub fn create_password(password_data: PasswordData, password_path: &str) -> Result<(), PassError> {
-    if is_password_file_exist(password_path) {
+    if is_file_exist(password_path) {
         Err(PassError::PasswordFileAlreadyExists)
     } else {
         encrypt_password(password_data, password_path)
