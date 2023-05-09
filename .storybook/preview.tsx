@@ -1,9 +1,11 @@
-import { Box, ChakraProvider, useColorMode } from "@chakra-ui/react";
+import { Box, Text, ChakraProvider, useColorMode } from "@chakra-ui/react";
 import type { Decorator, Preview } from "@storybook/react";
 import React, { useEffect } from "react";
 import theme from '../src/theme';
 import { useDarkMode } from 'storybook-dark-mode';
 import { themes } from '@storybook/theming';
+import { SWRConfig } from "swr";
+import { fallback } from "./mocks";
 
 const withTheme: Decorator = (StoryFn, context) => {
   return (
@@ -35,15 +37,17 @@ const DocumentationWrapper = ({ children, context }) => {
   }, [isDarkMode]);
 
   return (
-    <Box
-      id="storybook-wrapper"
-      p="4"
-      pb="8"
-      bg={colorMode === 'dark' ? 'gray.900' : 'white'}
-      flex="1"
-    >
-      {children}
-    </Box>
+    <SWRConfig value={{ fallback, revalidateOnFocus: false, revalidateOnMount: false }}>
+      <Box
+        id="storybook-wrapper"
+        p="4"
+        pb="8"
+        bg={colorMode === 'dark' ? 'gray.900' : 'white'}
+        flex="1"
+      >
+        {children}
+      </Box>
+    </SWRConfig >
   );
 };
 

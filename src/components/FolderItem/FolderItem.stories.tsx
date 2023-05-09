@@ -31,3 +31,17 @@ export const Primary: Story = {
         }
     },
 };
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const FolderWithoutSecretKey: Story = {
+    args: {
+        children: "His Folder",
+        folder: {
+            filename: "His Folder",
+            path: "/myPath/His Folder",
+            filetype: "DIRECTORY",
+            lastModified: "None",
+            encryptKeysId: ["DDEEFF"],
+        }
+    },
+};
