@@ -1,7 +1,7 @@
 import FolderItem from "@/components/FolderItem";
 import PasswordItem from "@/components/PasswordItem";
 import { useListPassword } from "@/hooks/password";
-import { FileDto } from "@/types/file";
+import { PassFile } from "@/types/file";
 import { Stack, StackDivider, StackProps, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
@@ -14,8 +14,8 @@ export default function PasswordList({ path, onClickFolder, ...rest }: PasswordL
     const router = useRouter();
     const { data: listPassword, isLoading, error } = useListPassword(path.join('/'));
 
-    const handleClickFolder = (filedto: FileDto) => {
-        onClickFolder?.(filedto.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', ''));
+    const handleClickFolder = (PassFile: PassFile) => {
+        onClickFolder?.(PassFile.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', ''));
     }
 
     if (error) {

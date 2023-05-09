@@ -1,7 +1,7 @@
 import FolderItem from "@/components/FolderItem";
 import PasswordItem from "@/components/PasswordItem";
 import { useSearchPassword } from "@/hooks/password";
-import { FileDto } from "@/types/file";
+import { PassFile } from "@/types/file";
 import { Stack, StackDivider, StackProps, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
@@ -16,8 +16,8 @@ export default function SearchResult({ path, searchWord, onClickFolder, ...rest 
     const { data: listPassword, isLoading, error } = useSearchPassword(path.join('/'), searchWord);
 
     console.log({ listPassword })
-    const handleClickFolder = (filedto: FileDto) => {
-        onClickFolder?.(filedto.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', ''));
+    const handleClickFolder = (PassFile: PassFile) => {
+        onClickFolder?.(PassFile.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', ''));
     }
 
     if (error) {

@@ -1,11 +1,11 @@
 import { useDeletePasswordFolder, useKeys } from "@/hooks/password";
-import { FileDto } from "@/types/file";
+import { PassFile } from "@/types/file";
 import { Spacer, Stack, Icon, Text, StackProps, Popover, PopoverTrigger, Button, PopoverContent, PopoverCloseButton, PopoverHeader, PopoverBody, PopoverArrow, useDisclosure, UseDisclosureProps } from "@chakra-ui/react";
 import { useState } from "react";
 import { FiArrowRightCircle, FiFolder, FiEdit, FiTrash2, FiAlertTriangle } from "react-icons/fi"
 
 type FolderItemProps = React.PropsWithChildren<StackProps> & {
-    folder: FileDto
+    folder: PassFile
 }
 
 export default function FolderItem({ children, folder, ...rest }: FolderItemProps) {

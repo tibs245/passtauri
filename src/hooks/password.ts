@@ -1,20 +1,20 @@
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 import { TauriFetcher, TauriFetcherArgs } from '@/hooks/config'
-import { FileDto } from '@/types/file'
+import { PassFile } from '@/types/file'
 import { Password, PasswordWithPath } from '@/types/password'
 import { useSWRConfig } from "swr";
 import { ActionResult } from '@/types/actionResult'
 import { TauriError } from '@/types/tauriError'
 import { Key } from '@/types/key'
 
-export const useListPassword = (path = "", options = {}) => useSWR<FileDto[], TauriError>(
+export const useListPassword = (path = "", options = {}) => useSWR<PassFile[], TauriError>(
         { _key: "list_password_path", command: 'list_password_path', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path } },
         TauriFetcher,
         options
     )
 
-export const useSearchPassword = (path = "", search = "", options = {}) => useSWR<FileDto[], TauriError>(
+export const useSearchPassword = (path = "", search = "", options = {}) => useSWR<PassFile[], TauriError>(
         { _key: "search_password", command: 'search_password', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path, search } },
         TauriFetcher,
         options
