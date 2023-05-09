@@ -9,7 +9,7 @@ export type PasswordBreadcrumbProps = BreadcrumbProps & {
 export default function PassBreadcrumb({ path, onClickFolder, ...rest }: PasswordBreadcrumbProps) {
     return <Breadcrumb {...rest}>
         <BreadcrumbItem>
-            <BreadcrumbLink key="ROOT" onClick={() => onClickFolder("/")}><Icon as={FiHome} /></BreadcrumbLink>
+            <BreadcrumbLink key="ROOT" onClick={() => onClickFolder("")}><Icon as={FiHome} /></BreadcrumbLink>
         </BreadcrumbItem>
 
         {

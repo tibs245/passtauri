@@ -16,7 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const [search, setSearch] = useState<string>("");
 
   const goToFolder = (folder: string) => {
-    setPath(folder.split('/'))
+    folder.length === 0 ? setPath([]) : setPath(folder.split('/'))
     setSearch("")
   }
 
