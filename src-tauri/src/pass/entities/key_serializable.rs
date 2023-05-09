@@ -25,7 +25,6 @@ pub struct KeySerializable {
 
 impl From<&Key> for KeySerializable {
     fn from(key: &Key) -> KeySerializable {
-        println!("{:?}", key.user_ids());
         KeySerializable {
             fingerprint: match key.fingerprint_raw() {
                 Some(fingerprint) => Some(fingerprint.to_string_lossy().to_string()),

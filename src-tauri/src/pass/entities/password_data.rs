@@ -32,7 +32,6 @@ impl From<String> for PasswordData {
 
             if username_regex.is_match(line) {
                 username = Some(username_regex.captures(line).unwrap()[1].to_string());
-                println!("{:?}", username_regex.captures(line).unwrap());
                 continue;
             }
 
