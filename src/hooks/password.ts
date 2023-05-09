@@ -45,6 +45,23 @@ export const useDeletePassword = (passwordPath: string | null, options = {}) => 
 }
 
 
+export const useDeletePasswordFolder = (folderPath: string | null, options = {}) => {
+    const { mutate } = useSWRConfig()
+
+    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs | null>(
+        folderPath ? { command: 'delete_password_folder', args: { folderPath } } : null,
+        TauriFetcher,
+        {
+            onSuccess: () => {
+                mutate((key: any) => key?.command.includes("list_password_path", "search_password"),
+                    undefined,
+                    { revalidate: true }
+                )
+            },
+            ...options
+        })
+}
+
 export const useCreatePassword = (options = {}) => {
     const { mutate } = useSWRConfig()
 

@@ -7,8 +7,8 @@ use crate::{pass::entities::file_details::FileDetails, utils::remove_last_dir};
 use crate::pass::error::PassError;
 
 use super::repository::{
-    self, decrypt_password_file, delete_password_file, get_gpg_id_from_path, is_file_exist,
-    list_files_path, password_store_path, search_files,
+    self, decrypt_password_file, delete_folder, delete_password_file, get_gpg_id_from_path,
+    is_file_exist, list_files_path, password_store_path, search_files,
 };
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
@@ -135,4 +135,8 @@ pub fn update_password(password_data: PasswordData, password_path: &str) -> Resu
 
 pub fn delete_password(path: &str) -> Result<(), PassError> {
     delete_password_file(path)
+}
+
+pub fn delete_password_folder(path: &str) -> Result<(), PassError> {
+    delete_folder(path)
 }

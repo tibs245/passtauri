@@ -1,23 +1,57 @@
-import { useKeys } from "@/hooks/password";
-import { Spacer, Stack, Icon, Text, StackProps } from "@chakra-ui/react";
-import { FiArrowRightCircle, FiFolder } from "react-icons/fi"
+import { useDeletePasswordFolder, useKeys } from "@/hooks/password";
+import { FileDto } from "@/types/file";
+import { Spacer, Stack, Icon, Text, StackProps, Popover, PopoverTrigger, Button, PopoverContent, PopoverCloseButton, PopoverHeader, PopoverBody, PopoverArrow, useDisclosure, UseDisclosureProps } from "@chakra-ui/react";
+import { useState } from "react";
+import { FiArrowRightCircle, FiFolder, FiEdit, FiTrash2, FiAlertTriangle } from "react-icons/fi"
 
 type FolderItemProps = React.PropsWithChildren<StackProps> & {
-    keys: string[]
+    folder: FileDto
 }
 
-export default function FolderItem({ children, keys, ...rest }: FolderItemProps) {
+export default function FolderItem({ children, folder, ...rest }: FolderItemProps) {
+    const { isOpen, onToggle, onClose } = useDisclosure()
+    const [isConfirmDelete, setIsConfirmDelete] = useState(false);
     const { data } = useKeys();
+    const { trigger, isMutating } = useDeletePasswordFolder(folder.path);
 
-    const canDecrypt = keys?.some(keyId =>
+    const handleDeletePassword = () => {
+        trigger()
+        // Todo change route if folder is selected
+    }
+
+    const canDecrypt = folder.encryptKeysId?.some(keyId =>
         data?.find(key => key.fingerprint == keyId)?.canSign
     ) ?? false
 
-    console.log({ data, keys, canDecrypt })
-    return <Stack height="3rem" alignItems="center " direction="row" spacing={6} px={9} role="group" cursor="pointer" {...rest}>
-        <Icon as={FiFolder} boxSize={5} fill={canDecrypt ? 'brand.800' : 'white'} />
-        <Text>{children}</Text>
-        <Spacer />
-        <Icon as={FiArrowRightCircle} boxSize={5} display="none" _groupHover={{ display: "block" }} />
-    </Stack >
+    function handleClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        e.preventDefault();
+        onToggle();
+    }
+
+    return <Popover
+        isOpen={isOpen}
+        onClose={onClose}
+        placement="auto-end">
+        <PopoverTrigger>
+            <Stack height="3rem" alignItems="center " direction="row" spacing={6} px={9} role="group" cursor="pointer" onContextMenu={handleClick} {...rest}>
+                <Icon as={FiFolder} boxSize={5} fill={canDecrypt ? 'brand.800' : 'white'} />
+                <Text>{children}</Text>
+                <Spacer />
+                <Icon as={FiArrowRightCircle} boxSize={5} display="none" _groupHover={{ display: "block" }} />
+            </Stack>
+        </PopoverTrigger>
+        <PopoverContent>
+            <PopoverArrow />
+            <PopoverBody>
+                <Stack>
+                    <Button colorScheme="brand" leftIcon={<Icon as={FiEdit} />} isDisabled>Modifier</Button>
+                    {isConfirmDelete ?
+                        <Button colorScheme="red" leftIcon={<Icon as={FiAlertTriangle} />} onClick={handleDeletePassword} isLoading={isMutating}>Sure ?</Button>
+                        :
+                        <Button colorScheme="red" variant="outline" leftIcon={<Icon as={FiTrash2} />} onClick={() => setIsConfirmDelete(true)} isLoading={isMutating}>Supprimer</Button>
+                    }
+                </Stack>
+            </PopoverBody>
+        </PopoverContent>
+    </Popover >
 }

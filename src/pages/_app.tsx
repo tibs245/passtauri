@@ -15,12 +15,6 @@ export default function App({ Component, pageProps }: AppProps) {
   const [path, setPath] = useState<string[]>([]);
   const [search, setSearch] = useState<string>("");
 
-  const goBackToFolder = (folder: string) => {
-    if (folder === "ROOT") {
-      setPath([]);
-    }
-  }
-
   const goToFolder = (folder: string) => {
     setPath(folder.split('/'))
     setSearch("")
@@ -42,7 +36,7 @@ export default function App({ Component, pageProps }: AppProps) {
               PassTauri
             </Heading>
           </Link>
-          <PassBreadcrumb path={path} onClickFolder={goBackToFolder} />
+          <PassBreadcrumb path={path} onClickFolder={goToFolder} />
         </Stack>
         <Spacer />
         <Icon as={FiSettings} fontSize="2xl" />

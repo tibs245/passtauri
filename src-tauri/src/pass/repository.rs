@@ -35,6 +35,13 @@ pub fn delete_password_file(password_path: &str) -> Result<(), PassError> {
     }
 }
 
+pub fn delete_folder(folder_path: &str) -> Result<(), PassError> {
+    match fs::remove_dir_all(folder_path) {
+        Ok(_) => Ok(()),
+        Err(error) => Err(PassError::UnableToDeletePasswordFile(error)),
+    }
+}
+
 pub fn decrypt_password_file(password_path: &str) -> Result<String, PassError> {
     let mut ctx = get_context_openpgp_protocol()?;
     let mut input = open_file(password_path)?;

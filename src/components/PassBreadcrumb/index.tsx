@@ -10,12 +10,12 @@ export default function PassBreadcrumb({ path, onClickFolder, ...rest }: Passwor
 
     return <Breadcrumb {...rest}>
         <BreadcrumbItem>
-            <BreadcrumbLink key="ROOT" onClick={() => onClickFolder("ROOT")}><Icon as={FiHome} /></BreadcrumbLink>
+            <BreadcrumbLink key="ROOT" onClick={() => onClickFolder("/")}><Icon as={FiHome} /></BreadcrumbLink>
         </BreadcrumbItem>
 
         {
-            path?.map(folder => <BreadcrumbItem key={folder}>
-                <BreadcrumbLink onClick={() => onClickFolder(folder)} >
+            path?.map((folder, index) => <BreadcrumbItem key={index + '-' + folder}>
+                <BreadcrumbLink onClick={() => onClickFolder(path.slice(0, index + 1).join('/'))} >
                     <Icon as={FiFolder} /> {folder}
                 </BreadcrumbLink>
             </BreadcrumbItem>)

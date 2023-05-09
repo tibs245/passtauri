@@ -33,7 +33,7 @@ export default function PasswordList({ path, onClickFolder, ...rest }: PasswordL
         {listPassword?.map(fileItem => fileItem.filetype === "DIRECTORY" ?
             <FolderItem key={fileItem.filename}
                 _hover={{ backgroundColor: 'gray.100' }}
-                keys={fileItem.encryptKeysId}
+                folder={fileItem}
                 onClick={() => handleClickFolder(fileItem)}
             >{fileItem.filename}</FolderItem> :
             <PasswordItem key={fileItem.filename}

@@ -89,6 +89,20 @@ pub fn delete_password(password_path: &str) -> Result<ActionResult, ActionResult
 }
 
 #[tauri::command]
+pub fn delete_password_folder(folder_path: &str) -> Result<ActionResult, ActionResult> {
+    match service::delete_password_folder(folder_path) {
+        Ok(()) => Ok(ActionResult {
+            result: true,
+            error: None,
+        }),
+        Err(error) => Err(ActionResult {
+            result: false,
+            error: Some(error.into()),
+        }),
+    }
+}
+
+#[tauri::command]
 pub fn get_all_keys<'a>() -> Result<Vec<KeySerializable>, PassError> {
     match service::get_all_keys() {
         Ok(keys) => Ok(keys.iter().map(KeySerializable::from).collect()),

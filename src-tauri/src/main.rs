@@ -15,6 +15,7 @@ fn main() {
             pass::pass::read_password,
             pass::pass::generate_password,
             pass::pass::delete_password,
+            pass::pass::delete_password_folder,
             pass::pass::create_password,
             pass::pass::update_password,
             pass::pass::get_all_keys,
