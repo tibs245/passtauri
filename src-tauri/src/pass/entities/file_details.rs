@@ -6,7 +6,7 @@ use std::{
 use crate::utils;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum FileTypeAPI {
     DIRECTORY,
     FILE,
@@ -30,7 +30,7 @@ impl From<FileType> for FileTypeAPI {
         }
     }
 }
-
+#[derive(Debug)]
 pub struct FileDetails {
     pub filename: String,
     pub path: String,

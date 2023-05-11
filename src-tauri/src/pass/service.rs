@@ -6,6 +6,7 @@ use crate::{pass::entities::file_details::FileDetails, utils::remove_last_dir};
 
 use crate::pass::error::PassError;
 
+use super::entities::folder::FolderDetailsWithChildren;
 use super::repository::{
     self, decrypt_password_file, delete_folder, delete_password_file, get_gpg_id_from_path,
     is_file_exist, list_files_path, password_store_path, search_files,
@@ -66,6 +67,39 @@ pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
         })
         .filter(|file| !file.is_cached_dir())
         .collect())
+}
+
+pub fn list_folder_tree(path: &str) -> Result<Option<Vec<FolderDetailsWithChildren>>, PassError> {
+    let children: Result<Vec<FolderDetailsWithChildren>, PassError> = list_files_path(path)?
+        .filter(|file| file.as_ref().unwrap().file_type().unwrap().is_dir())
+        .map(|file| -> Result<FolderDetailsWithChildren, PassError> {
+            let file_unwraped = file.unwrap();
+            let children = list_folder_tree(file_unwraped.path().to_str().unwrap())?;
+
+            Ok(FolderDetailsWithChildren {
+                children: children,
+                file_details: FileDetails {
+                    encrypt_keys_id: folder_gpg_id_or_parents(
+                        file_unwraped.path().to_str().unwrap(),
+                    )
+                    .unwrap_or(None),
+                    ..file_unwraped.into()
+                },
+            })
+        })
+        .filter(|result_file| match result_file {
+            Ok(file) => !file.is_cached_dir(),
+            _ => false,
+        })
+        .collect();
+
+    let children = children?;
+
+    if children.len() == 0 {
+        return Ok(None);
+    } else {
+        return Ok(Some(children));
+    }
 }
 
 pub fn search_password(path: &str, search: &str) -> Result<Option<Vec<FileDetails>>, PassError> {

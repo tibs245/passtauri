@@ -12,6 +12,7 @@ fn main() {
             pass::explore::list_password,
             pass::explore::list_password_path,
             pass::explore::search_password,
+            pass::explore::get_folder_tree,
             pass::pass::read_password,
             pass::pass::generate_password,
             pass::pass::delete_password,
