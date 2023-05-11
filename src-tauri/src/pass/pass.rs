@@ -46,6 +46,11 @@ pub fn create_password(
 }
 
 #[tauri::command]
+pub fn init_pass_folder(path: &str, keys: Vec<&str>) -> Result<(), PassError> {
+    service::init_pass_folder(path, keys)
+}
+
+#[tauri::command]
 pub fn update_password(
     password_path: &str,
     name: &str,

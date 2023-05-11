@@ -51,7 +51,7 @@ export default function FolderForm({ folderFile, isMutating, onSubmit, onCancel 
     const { data: keysAvailable } = useKeys();
     const { data: treeFolder } = useTreeFolder();
 
-    const pathOptions = useMemo(() => treeFolder?.map((child) => mapFolderAndChildren(child)).flat() ?? [], [treeFolder])
+    const pathOptions = useMemo(() => [{ value: (process.env.NEXT_PUBLIC_PASSWORD_STORE ?? ''), depth: 0, label: 'Home : /', name: 'Home : /', parents: '' }, ...(treeFolder?.map((child) => mapFolderAndChildren(child)).flat() ?? [])], [treeFolder])
     const keysOptions = useMemo((): KeyOption[] => (
         keysAvailable?.map(key => ({
             label: key.user?.[0].name + ' - ' + key.user?.[0].email,

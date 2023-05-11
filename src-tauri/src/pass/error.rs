@@ -10,6 +10,7 @@ pub enum PassError {
     UnableToOpenFile(Error),
     UnableToWritePasswordFile(Error),
     UnableToDeletePasswordFile(Error),
+    UnableToWriteGpgKeyFile(Error),
     KeyNotFound(Error),
     PasswordFileAlreadyExists,
     EnableParseContentToString(Error),
@@ -35,6 +36,9 @@ impl From<&PassError> for String {
             }
             PassError::UnableToDeletePasswordFile(error) => {
                 format!("Impossible to delete password file : {}", error)
+            }
+            PassError::UnableToWriteGpgKeyFile(error) => {
+                format!("Impossible to write gpg key file : {}", error)
             }
             PassError::KeyNotFound(error) => {
                 format!("Impossible de trouver la clef : {}", error)

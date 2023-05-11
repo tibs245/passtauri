@@ -12,11 +12,16 @@ export const useTreeFolder = (options = {}) => useSWR<PassFolder[], TauriError>(
 )
 
 
-export const useCreateFolder = (options = {}) => {
+export type PassFileParams = {
+    path: string;
+    keys: string[];
+};
+
+export const useCreatePasswordFolder = (options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, PassFile>(
-        { command: 'create_password_folder', args: {} },
+    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, PassFileParams>(
+        { command: 'init_pass_folder', args: {} },
         TauriFetcher,
         {
             onSuccess: () => {

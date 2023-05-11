@@ -8,8 +8,8 @@ use crate::pass::error::PassError;
 
 use super::entities::folder::FolderDetailsWithChildren;
 use super::repository::{
-    self, decrypt_password_file, delete_folder, delete_password_file, get_gpg_id_from_path,
-    is_file_exist, list_files_path, password_store_path, search_files,
+    self, create_pass_folder, decrypt_password_file, delete_folder, delete_password_file,
+    get_gpg_id_from_path, is_file_exist, list_files_path, password_store_path, search_files,
 };
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
@@ -138,11 +138,19 @@ fn encrypt_password(password_data: PasswordData, password_path: &str) -> Result<
     repository::write_password_file(password_path, result_data)
 }
 
-pub fn create_password(password_data: PasswordData, password_path: &str) -> Result<(), PassError> {
-    if is_file_exist(password_path) {
+pub fn create_password(password_data: PasswordData, path: &str) -> Result<(), PassError> {
+    if is_file_exist(path) {
         Err(PassError::PasswordFileAlreadyExists)
     } else {
-        encrypt_password(password_data, password_path)
+        encrypt_password(password_data, path)
+    }
+}
+
+pub fn init_pass_folder(path: &str, keys: Vec<&str>) -> Result<(), PassError> {
+    if is_file_exist(path) {
+        Err(PassError::PasswordFileAlreadyExists)
+    } else {
+        create_pass_folder(path, keys)
     }
 }
 

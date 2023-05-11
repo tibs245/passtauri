@@ -21,6 +21,23 @@ pub fn is_file_exist(password_path: &str) -> bool {
     Path::new(password_path).exists()
 }
 
+pub fn create_pass_folder(folder_path: &str, keys: Vec<&str>) -> Result<(), PassError> {
+    match fs::create_dir(folder_path) {
+        Ok(()) => write_keys_file(folder_path, keys),
+        Err(error) => Err(PassError::UnableToWritePasswordFile(error)),
+    }
+}
+
+pub fn write_keys_file(folder_path: &str, key: Vec<&str>) -> Result<(), PassError> {
+    match fs::write(
+        folder_path.to_owned() + &"/.gpg-id",
+        key.join("\n").to_owned() + "\n",
+    ) {
+        Ok(()) => Ok(()),
+        Err(error) => Err(PassError::UnableToWriteGpgKeyFile(error)),
+    }
+}
+
 pub fn write_password_file(password_path: &str, content: Vec<u8>) -> Result<(), PassError> {
     match fs::write(password_path, content) {
         Ok(()) => Ok(()),

@@ -19,6 +19,7 @@ fn main() {
             pass::pass::delete_password_folder,
             pass::pass::create_password,
             pass::pass::update_password,
+            pass::pass::init_pass_folder,
             pass::pass::get_all_keys,
         ])
         .run(tauri::generate_context!())

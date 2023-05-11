@@ -3,20 +3,24 @@ import { FiXCircle } from "react-icons/fi"
 import FolderForm from "@/components/FolderForm"
 import { useRouter } from "next/router"
 import { PassFolder } from "@/types/file"
+import { useCreatePasswordFolder } from "@/hooks/folder"
 
 export default function FolderCreateForm() {
     const router = useRouter();
     const defaultPath = router.query.path as string[] ?? [];
 
+    const { trigger: triggerCreateFolder, isMutating: isCreatePasswordFolderMutating } = useCreatePasswordFolder();
     const goBack = () => {
         router.push('/');
     }
 
-    const handleCreateFolder = async (folder: PassFolder) => {
-        // const pathToSave = (process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '') + '/' + defaultPath.join('/') + '/' + password.name + '.gpg'
-        // await triggerCreateFolder({ ...password, passwordPath: pathToSave });
-        // router.push('/password/view/' + pathToSave)
-        console.log({ folder })
+    const handleCreateFolder = async ({ path, filename, encryptKeysId }: PassFolder) => {
+        try {
+            await triggerCreateFolder({ path: path + '/' + filename, keys: (encryptKeysId ?? []) });
+        } catch (error) {
+            console.log({ error })
+        }
+        router.push('/')
     }
 
     const defaultFolder: PassFolder = {
@@ -31,6 +35,6 @@ export default function FolderCreateForm() {
             <Spacer />
             <Button leftIcon={<Icon as={FiXCircle} />} colorScheme="red" variant="ghost" onClick={goBack}>Cancel</Button>
         </Stack>
-        <FolderForm folderFile={defaultFolder} isMutating={false} onSubmit={handleCreateFolder} onCancel={goBack} />
+        <FolderForm folderFile={defaultFolder} isMutating={isCreatePasswordFolderMutating} onSubmit={handleCreateFolder} onCancel={goBack} />
     </>
 }

@@ -9,5 +9,5 @@ export type Password = {
 }
 
 export type PasswordWithPath = Password & {
-    passwordPath: string
+    path: string
 }

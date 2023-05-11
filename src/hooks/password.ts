@@ -64,7 +64,7 @@ export const useUpdatePassword = (passwordPath: string, options = {}) => {
     const { mutate } = useSWRConfig()
 
     return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, Password>(
-        { command: 'update_password', args: { passwordPath } },
+        { command: 'update_password', args: { path: passwordPath } },
         TauriFetcher,
         {
             onSuccess: () => {
