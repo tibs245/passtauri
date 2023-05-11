@@ -7,7 +7,7 @@ export type TauriFetcherArgs = {
 
 export const TauriFetcher = <T>({ command, args }: TauriFetcherArgs, argsMutation: InvokeArgs = {}): Promise<T> => {
 
-    console.log({ invoke: command, args, argsMutation: argsMutation?.arg })
+    console.debug({ invoke: command, args, argsMutation: argsMutation?.arg })
     const argMut = argsMutation?.arg as Object
     return invoke<T>(command, { ...args, ...argMut })
 }

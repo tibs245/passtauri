@@ -44,7 +44,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Flex minHeight="calc(100vh - 5em)">
         <Box overflowY="scroll" maxHeight="calc(100vh - 5em)" minWidth="20em" maxWidth="20vw" borderRightColor="gray.200" borderRightWidth="1px">
           <Flex>
-            <Button colorScheme='blue' leftIcon={<Icon as={FiFolderPlus} />} isDisabled flex="1" rounded={0}>Add Folder</Button>
+            <Button as={Link} colorScheme='blue' leftIcon={<Icon as={FiFolderPlus} />} flex="1" href={`/folder/create/${path.join('/')}`} rounded={0}>Add Folder</Button>
             <Button as={Link} colorScheme='green' leftIcon={<Icon as={FiFilePlus} />} flex="1" href={`/password/create/${path.join('/')}`} rounded={0}>Add Password</Button>
           </Flex>
           <SearchBar onSearch={setSearch} />

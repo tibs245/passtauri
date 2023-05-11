@@ -22,6 +22,7 @@
     "@types/node": "18.15.11",
     "@types/react": "18.0.35",
     "@types/react-dom": "18.0.11",
+    "chakra-react-select": "^4.6.0",
     "color2k": "^2.0.2",
     "dlv": "^1.1.3",
     "eslint": "8.38.0",
@@ -32,6 +33,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
     "react-icons": "^4.8.0",
+    "react-select": "^5.7.3",
     "swr": "^2.1.5",
     "typescript": "5.0.4"
   },

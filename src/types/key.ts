@@ -14,6 +14,29 @@ export type Key = {
     ownerTrust: Validity;
 }
 
+
+export type KeyOption = {
+    label: string;
+    value: string;
+    trust: Validity;
+    isExpired: boolean;
+    isRevoked: boolean;
+    isInvalid: boolean;
+    isDisabled: boolean;
+}
+
+export const KeyOptionNewUnknowKey = (keyId: string): KeyOption => {
+    return {
+        label: keyId,
+        value: keyId,
+        trust: "UNKNOWN",
+        isExpired: false,
+        isRevoked: false,
+        isInvalid: false,
+        isDisabled: false,
+    }
+}
+
 export type GpgUser = {
     validity: Validity;
     name: string;

@@ -1,4 +1,5 @@
-import { useDeletePasswordFolder, useKeys } from "@/hooks/password";
+import { useDeletePasswordFolder } from "@/hooks/folder";
+import { useKeys } from "@/hooks/opengpg"
 import { PassFile } from "@/types/file";
 import { Spacer, Stack, Icon, Text, StackProps, Popover, PopoverTrigger, Button, PopoverContent, PopoverCloseButton, PopoverHeader, PopoverBody, PopoverArrow, useDisclosure, UseDisclosureProps } from "@chakra-ui/react";
 import { useState } from "react";

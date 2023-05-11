@@ -15,7 +15,6 @@ export default function SearchResult({ path, searchWord, onClickFolder, ...rest 
     const router = useRouter();
     const { data: listPassword, isLoading, error } = useSearchPassword(path.join('/'), searchWord);
 
-    console.log({ listPassword })
     const handleClickFolder = (PassFile: PassFile) => {
         onClickFolder?.(PassFile.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', ''));
     }

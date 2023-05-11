@@ -18,7 +18,6 @@ export default function WriteInputContent({ content }: WriteInputContentProps) {
         await writeText(content);
         setSecondBeforeReset(30); // Pour l'affichage
         let secondBeforeResetIntern = 30; // Pour la fonction
-        console.log({ secondBeforeReset })
 
         let resetInterval = setInterval(() => {
             setSecondBeforeReset(secondBeforeResetIntern - 1);

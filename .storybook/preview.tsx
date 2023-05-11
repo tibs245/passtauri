@@ -26,7 +26,6 @@ const DocumentationWrapper = ({ children, context }) => {
   useEffect(() => {
     // Add timeout to prevent unsync color mode between docs and classic modes
     const timer = setTimeout(() => {
-      console.log(isDarkMode);
       if (isDarkMode) {
         setColorMode('dark');
       } else {
