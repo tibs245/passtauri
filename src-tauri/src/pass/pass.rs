@@ -18,7 +18,7 @@ pub fn generate_password(list_of_caractere: &str, size: usize) -> String {
 
 #[tauri::command]
 pub fn create_password(
-    password_path: &str,
+    path: &str,
     name: &str,
     password: &str,
     username: Option<&str>,
@@ -42,7 +42,7 @@ pub fn create_password(
         },
     };
 
-    service::create_password(password_data, password_path)
+    service::create_password(password_data, path)
 }
 
 #[tauri::command]
