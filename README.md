@@ -1,38 +1,76 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PassTauri
+
+PassTauri is app developped with [Tauri](https://tauri.app/)
+
+### ⚠️⚠️ This project is for my pedagogy and is under developpement ⚠️⚠️
+
+This project is initially for my pedagogy of Rust and don't respect all best practice any time
+
+The objectif is to develop UI for [Pass](https://www.passwordstore.org/)
+
+I am inspired by [BitWarden](https://go.bitwarden.com)
+
+## Stack
+
+- [Tauri](https://tauri.app/)
+- [NextJS](https://nextjs.org/)
+- [React](https://fr.legacy.reactjs.org/)
+- [Rust](https://www.rust-lang.org/fr)
+- [Gpgme](https://github.com/gpg/gpgme)
+- [ChakraUI](https://chakra-ui.com/)
+- [Chakra React Select](https://github.com/csandman/chakra-react-select)
+- [React Hook Form](https://react-hook-form.com/)
+
+## Roadmap
+
+### V1 : Have all QtPass feature with better UI/UX
+
+- [x] Show password
+- [-] Create and edit password
+   - [ ] Form need to be improved
+- [x] Create and edit folder
+- [ ] Can choose gpg key by password
+- [x] Search password and folder
+- [ ] Have general settings (Have some data in hard code 🙄)
+- [ ] Have settings page
+- [x] Compatible Linux
+- [ ] Compatible Windows
+- [ ] Add git integration
+- [ ] Add OTP
+- [ ] Add generate QRCode
+- [ ] Insure sensible data is not stored in cache and is secure
+- [ ] Improve UI and add Responsive Design
+- [ ] Stabilize code for the community
+   - [ ] Refacto
+   - [ ] Add contributing.md
+- [ ] Add CI/CD
+
+## V2 : Add note section
+
+- [ ] Add folder to note
+- [ ] Add Markdown edit and preview
 
 ## Getting Started
 
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+pnpm run tauri dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Preview
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Home
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+<div align="center">
+            <img src="https://raw.githubusercontent.com/tibs245/passtauri/main/docs/home.png" alt="Home Passtauri" />
+</div>
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+<div align="center">
+            <img src="https://raw.githubusercontent.com/tibs245/passtauri/main/docs/generate_password.png" alt="Generate password" />
+</div>
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+<div align="center">
+            <img src="https://raw.githubusercontent.com/tibs245/passtauri/main/docs/view_password.png" alt="View password" />
+</div>
