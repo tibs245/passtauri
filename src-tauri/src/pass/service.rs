@@ -7,13 +7,10 @@ use crate::{pass::entities::file_details::FileDetails, utils::remove_last_dir};
 use crate::pass::error::PassError;
 
 use super::entities::folder::FolderDetailsWithChildren;
-use super::repository::{
-    self, create_pass_folder, decrypt_password_file, delete_folder, delete_password_file,
-    get_gpg_id_from_path, is_file_exist, list_files_path, password_store_path, search_files,
-};
+use super::repository;
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
-    let password_data = decrypt_password_file(password_path)?;
+    let password_data = repository::gpg::decrypt_password_file(password_path)?;
 
     Ok(PasswordData {
         name: password_path
@@ -27,7 +24,7 @@ pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError>
 }
 
 pub fn folder_gpg_id_or_parents(path: &str) -> Result<Option<Vec<String>>, PassError> {
-    let store_path = password_store_path()?;
+    let store_path = repository::folder::password_store_path()?;
 
     if !path.contains(&store_path) {
         return Err(PassError::PathNotInPasswordStorePath);
@@ -48,15 +45,15 @@ pub fn folder_gpg_id_or_parents(path: &str) -> Result<Option<Vec<String>>, PassE
 pub fn folder_gpg_id(path: &str) -> Result<Option<Vec<String>>, PassError> {
     let gpg_id_path = path.to_owned() + "/.gpg-id";
 
-    if is_file_exist(&gpg_id_path) {
-        Ok(Some(get_gpg_id_from_path(&gpg_id_path)?))
+    if repository::file_password::is_file_exist(&gpg_id_path) {
+        Ok(Some(repository::gpg::get_gpg_id_from_path(&gpg_id_path)?))
     } else {
         Ok(None)
     }
 }
 
 pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
-    Ok(list_files_path(path)?
+    Ok(repository::file_password::list_files_path(path)?
         .map(|file| -> FileDetails {
             let file_unwraped = file.unwrap();
             FileDetails {
@@ -70,28 +67,29 @@ pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
 }
 
 pub fn list_folder_tree(path: &str) -> Result<Option<Vec<FolderDetailsWithChildren>>, PassError> {
-    let children: Result<Vec<FolderDetailsWithChildren>, PassError> = list_files_path(path)?
-        .filter(|file| file.as_ref().unwrap().file_type().unwrap().is_dir())
-        .map(|file| -> Result<FolderDetailsWithChildren, PassError> {
-            let file_unwraped = file.unwrap();
-            let children = list_folder_tree(file_unwraped.path().to_str().unwrap())?;
+    let children: Result<Vec<FolderDetailsWithChildren>, PassError> =
+        repository::file_password::list_files_path(path)?
+            .filter(|file| file.as_ref().unwrap().file_type().unwrap().is_dir())
+            .map(|file| -> Result<FolderDetailsWithChildren, PassError> {
+                let file_unwraped = file.unwrap();
+                let children = list_folder_tree(file_unwraped.path().to_str().unwrap())?;
 
-            Ok(FolderDetailsWithChildren {
-                children: children,
-                file_details: FileDetails {
-                    encrypt_keys_id: folder_gpg_id_or_parents(
-                        file_unwraped.path().to_str().unwrap(),
-                    )
-                    .unwrap_or(None),
-                    ..file_unwraped.into()
-                },
+                Ok(FolderDetailsWithChildren {
+                    children: children,
+                    file_details: FileDetails {
+                        encrypt_keys_id: folder_gpg_id_or_parents(
+                            file_unwraped.path().to_str().unwrap(),
+                        )
+                        .unwrap_or(None),
+                        ..file_unwraped.into()
+                    },
+                })
             })
-        })
-        .filter(|result_file| match result_file {
-            Ok(file) => !file.is_cached_dir(),
-            _ => false,
-        })
-        .collect();
+            .filter(|result_file| match result_file {
+                Ok(file) => !file.is_cached_dir(),
+                _ => false,
+            })
+            .collect();
 
     let children = children?;
 
@@ -103,15 +101,17 @@ pub fn list_folder_tree(path: &str) -> Result<Option<Vec<FolderDetailsWithChildr
 }
 
 pub fn search_password(path: &str, search: &str) -> Result<Option<Vec<FileDetails>>, PassError> {
-    Ok(match search_files(path, search)? {
-        Some(results) => Some(
-            results
-                .iter()
-                .map(|f| -> FileDetails { f.into() })
-                .collect(),
-        ),
-        None => None,
-    })
+    Ok(
+        match repository::file_password::search_files(path, search)? {
+            Some(results) => Some(
+                results
+                    .iter()
+                    .map(|f| -> FileDetails { f.into() })
+                    .collect(),
+            ),
+            None => None,
+        },
+    )
 }
 
 // Directly inspired by : https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html#create-random-passwords-from-a-set-of-user-defined-characters
@@ -129,17 +129,17 @@ pub fn generate_string(list_of_caractere: &str, size: usize) -> String {
 }
 
 pub fn get_all_keys() -> Result<Vec<Key>, PassError> {
-    repository::get_all_keys()
+    repository::gpg::get_all_keys()
 }
 
 fn encrypt_password(password_data: PasswordData, password_path: &str) -> Result<(), PassError> {
-    let recipients = repository::get_keys(vec!["A55C6AADE9A6B18BEA78E857FC406DBF8E8EDB24"])?;
-    let result_data = repository::encrypt_string(password_data.into(), recipients)?;
-    repository::write_password_file(password_path, result_data)
+    let recipients = repository::gpg::get_keys(vec!["A55C6AADE9A6B18BEA78E857FC406DBF8E8EDB24"])?;
+    let result_data = repository::gpg::encrypt_string(password_data.into(), recipients)?;
+    repository::file_password::write_password_file(password_path, result_data)
 }
 
 pub fn create_password(password_data: PasswordData, path: &str) -> Result<(), PassError> {
-    if is_file_exist(path) {
+    if repository::file_password::is_file_exist(path) {
         Err(PassError::PasswordFileAlreadyExists)
     } else {
         encrypt_password(password_data, path)
@@ -147,10 +147,10 @@ pub fn create_password(password_data: PasswordData, path: &str) -> Result<(), Pa
 }
 
 pub fn init_pass_folder(path: &str, keys: Vec<&str>) -> Result<(), PassError> {
-    if is_file_exist(path) {
+    if repository::file_password::is_file_exist(path) {
         Err(PassError::PasswordFileAlreadyExists)
     } else {
-        create_pass_folder(path, keys)
+        repository::folder::create_pass_folder(path, keys)
     }
 }
 
@@ -176,9 +176,9 @@ pub fn update_password(password_data: PasswordData, password_path: &str) -> Resu
 }
 
 pub fn delete_password(path: &str) -> Result<(), PassError> {
-    delete_password_file(path)
+    repository::file_password::delete_password_file(path)
 }
 
 pub fn delete_password_folder(path: &str) -> Result<(), PassError> {
-    delete_folder(path)
+    repository::folder::delete_folder(path)
 }

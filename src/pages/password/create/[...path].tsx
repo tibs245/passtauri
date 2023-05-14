@@ -18,7 +18,7 @@ export default function PasswordEditionForm() {
     const handleCreatePassword = async (password: Password) => {
         const pathToSave = (process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '') + '/' + defaultPath.join('/') + '/' + password.name + '.gpg'
         await triggerCreatePassword({ ...password, path: pathToSave });
-        router.push('/password/view/' + pathToSave);
+        router.push('/password/view' + pathToSave);
     }
 
     return <>
