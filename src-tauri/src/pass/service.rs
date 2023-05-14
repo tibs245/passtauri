@@ -8,9 +8,11 @@ use crate::pass::error::PassError;
 
 use super::entities::folder::FolderDetailsWithChildren;
 use super::repository;
+use super::repository::file_password::open_file;
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
-    let password_data = repository::gpg::decrypt_password_file(password_path)?;
+    let mut file_content = open_file(password_path)?;
+    let password_data = repository::gpg::decrypt_password_file(&mut file_content)?;
 
     Ok(PasswordData {
         name: password_path

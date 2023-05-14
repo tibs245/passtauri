@@ -1,4 +1,4 @@
-use std::io::Read;
+use std::{fs::File, io::Read};
 
 use gpgme::{Context, Key, Protocol};
 
@@ -23,12 +23,11 @@ pub fn encrypt_string(content: String, recipients: Vec<Key>) -> Result<Vec<u8>, 
     }
 }
 
-pub fn decrypt_password_file(password_path: &str) -> Result<String, PassError> {
+pub fn decrypt_password_file(file_content: &mut File) -> Result<String, PassError> {
     let mut ctx = get_context_openpgp_protocol()?;
-    let mut input = open_file(password_path)?;
     let mut output = Vec::new();
 
-    match ctx.decrypt(&mut input, &mut output) {
+    match ctx.decrypt(file_content, &mut output) {
         Ok(_result) => Ok(String::from_utf8_lossy(&output).into()),
         Err(_error) => Err(PassError::OpenPgpProtocolNotFound),
     }
