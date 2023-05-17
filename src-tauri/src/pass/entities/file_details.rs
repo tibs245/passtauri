@@ -6,7 +6,7 @@ use std::{
 use crate::utils;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FileTypeAPI {
     DIRECTORY,
     FILE,
@@ -40,7 +40,7 @@ pub struct FileDetails {
 }
 
 impl FileDetails {
-    pub fn is_cached_dir(&self) -> bool {
+    pub fn is_cached(&self) -> bool {
         self.filename.chars().next().unwrap() == '.'
     }
 }
@@ -80,5 +80,105 @@ impl Serialize for FileDetails {
         s.serialize_field("lastModified", &utils::iso8601(&self.last_modified))?;
         s.serialize_field("encryptKeysId", &self.encrypt_keys_id)?;
         s.end()
+    }
+}
+
+mod test {
+    use super::*;
+    use std::env;
+    use std::fs;
+
+    #[test]
+    fn test_is_cached() {
+        let file_details = FileDetails {
+            filename: ".git".to_string(),
+            path: "/home/user/.password-store/.git".to_string(),
+            filetype: FileTypeAPI::FILE,
+            last_modified: SystemTime::now(),
+            encrypt_keys_id: None,
+        };
+
+        assert_eq!(file_details.is_cached(), true);
+
+        let file_details2 = FileDetails {
+            filename: "git".to_string(),
+            path: "/home/user/.password-store/git".to_string(),
+            filetype: FileTypeAPI::FILE,
+            last_modified: SystemTime::now(),
+            encrypt_keys_id: None,
+        };
+
+        assert_eq!(file_details2.is_cached(), false);
+    }
+
+    #[test]
+    fn test_serialize_file_from_dir_entry_with_file() {
+        let temp_dir = env::temp_dir()
+            .as_path()
+            .join("rust_unit_test_test_serialize_file_from_dir_entry_with_file");
+        let temp_file_name = "test_from_dir_entry";
+
+        if temp_dir.exists() {
+            fs::remove_dir_all(temp_dir.clone()).expect("Unable remove temp dir folder");
+        }
+
+        fs::create_dir(temp_dir.clone()).expect("Unable create temp dir to test");
+        // Create a temp file and write some content to it
+        fs::write((temp_dir.clone()).join(temp_file_name), "hello world")
+            .expect("Unable to write file");
+
+        let file_data = fs::read_dir(&temp_dir).unwrap().next().unwrap().unwrap();
+
+        let file_details = FileDetails::from(file_data);
+
+        assert_eq!(file_details.filename, temp_file_name.to_string());
+        assert_eq!(
+            file_details.path,
+            temp_dir
+                .clone()
+                .join(temp_file_name)
+                .to_string_lossy()
+                .to_string()
+        );
+        assert_eq!(file_details.filetype, FileTypeAPI::FILE);
+        assert_eq!(file_details.encrypt_keys_id, None);
+        assert!(file_details.is_cached() == false);
+
+        fs::remove_dir_all(temp_dir.clone()).expect("Unable remove temp dir folder");
+    }
+
+    #[test]
+    fn test_serialize_file_from_dir_entry_with_cached_directory() {
+        let temp_dir = env::temp_dir()
+            .as_path()
+            .join("rust_unit_test_test_serialize_file_from_dir_entry_with_cached_directory");
+        let temp_file_name = ".test_from_dir_entry";
+
+        if temp_dir.exists() {
+            fs::remove_dir_all(temp_dir.clone()).expect("Unable remove temp dir folder");
+        }
+
+        fs::create_dir(temp_dir.clone()).expect("Unable create temp dir to test");
+        // Create a temp file and write some content to it
+        fs::create_dir((temp_dir.clone()).join(temp_file_name)).expect("Unable to write folder");
+
+        let file_data = fs::read_dir(&temp_dir).unwrap().next().unwrap().unwrap();
+
+        let file_details = FileDetails::from(file_data);
+
+        assert_eq!(file_details.filename, temp_file_name.to_string());
+        assert_eq!(
+            file_details.path,
+            temp_dir
+                .clone()
+                .join(temp_file_name)
+                .to_string_lossy()
+                .to_string()
+        );
+        assert_eq!(file_details.filetype, FileTypeAPI::DIRECTORY);
+        assert_eq!(file_details.encrypt_keys_id, None);
+        assert!(file_details.is_cached());
+
+        fs::remove_dir_all(temp_dir.clone()).expect("Unable remove temp dir folder");
     }
 }

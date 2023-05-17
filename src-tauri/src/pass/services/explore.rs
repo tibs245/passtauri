@@ -15,7 +15,7 @@ pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
                 ..file_unwraped.into()
             }
         })
-        .filter(|file| !file.is_cached_dir())
+        .filter(|file| !file.is_cached())
         .collect())
 }
 
@@ -39,7 +39,7 @@ pub fn list_folder_tree(path: &str) -> Result<Option<Vec<FolderDetailsWithChildr
                 })
             })
             .filter(|result_file| match result_file {
-                Ok(file) => !file.is_cached_dir(),
+                Ok(file) => !file.is_cached(),
                 _ => false,
             })
             .collect();

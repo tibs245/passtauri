@@ -12,7 +12,7 @@ pub struct FolderDetailsWithChildren {
 }
 
 impl FolderDetailsWithChildren {
-    pub fn is_cached_dir(&self) -> bool {
+    pub fn is_cached(&self) -> bool {
         self.file_details.filename.chars().next().unwrap() == '.'
     }
 }

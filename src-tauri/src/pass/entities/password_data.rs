@@ -80,3 +80,105 @@ impl From<PasswordData> for String {
         data_to_stringify.join("\n")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_from_string() {
+        let password_data_string = "password123\n".to_string()
+            + "username: testuser\n"
+            + "some extra data\n"
+            + "otpauth://totp/somedata\n"
+            + "URL: http://*.some_site.com/";
+
+        let password_data = PasswordData::from(password_data_string);
+
+        assert_eq!(password_data.name, "");
+        assert_eq!(password_data.password, "password123");
+        assert_eq!(
+            Some("some extra data\nURL: http://*.some_site.com/\n".to_string()),
+            password_data.extra
+        );
+        assert_eq!(
+            Some("otpauth://totp/somedata".to_string()),
+            password_data.otp
+        );
+        assert_eq!(Some("testuser".to_string()), password_data.username);
+    }
+
+    #[test]
+    fn test_from_string_with_only_password() {
+        let password_data_string = "password123".to_string();
+
+        let password_data = PasswordData::from(password_data_string);
+
+        assert_eq!(password_data.name, "");
+        assert_eq!(password_data.password, "password123");
+        assert_eq!(None, password_data.extra);
+        assert_eq!(None, password_data.otp);
+        assert_eq!(None, password_data.username);
+    }
+
+    #[test]
+    fn test_from_string_with_special_charactere() {
+        let password_data_string = "password12345é'&é²&_é)àç&éè² \n".to_string();
+
+        let password_data = PasswordData::from(password_data_string);
+
+        assert_eq!(password_data.name, "");
+        assert_eq!(password_data.password, "password12345é'&é²&_é)àç&éè² ");
+        assert_eq!(None, password_data.extra);
+        assert_eq!(None, password_data.otp);
+        assert_eq!(None, password_data.username);
+    }
+
+    #[test]
+    fn test_to_string() {
+        let password_data = PasswordData {
+            name: "".to_string(),
+            password: "password123".to_string(),
+            extra: Some("some extra data\n".to_string()),
+            username: Some("testuser".to_string()),
+            otp: Some("otpauth://totp/somedata".to_string()),
+        };
+        let password_data_string = String::from(password_data);
+
+        assert_eq!(
+            password_data_string,
+            "password123\notpauth://totp/somedata\nusername:testuser\n\nsome extra data\n"
+        );
+    }
+
+    #[test]
+    fn test_to_string_without_username() {
+        let password_data_without_username = PasswordData {
+            name: "".to_string(),
+            password: "password123".to_string(),
+            extra: Some("some extra data\n".to_string()),
+            username: None,
+            otp: Some("otpauth://totp/somedata".to_string()),
+        };
+        let password_data_string_without_username = String::from(password_data_without_username);
+
+        assert_eq!(
+            password_data_string_without_username,
+            "password123\notpauth://totp/somedata\n\nsome extra data\n"
+        );
+    }
+
+    #[test]
+    fn test_to_string_with_only_password() {
+        let password_with_only_password = PasswordData {
+            name: "My Password".to_string(),
+            password: "password123".to_string(),
+            extra: None,
+            username: None,
+            otp: None,
+        };
+        let password_data_string_with_only_password = String::from(password_with_only_password);
+
+        assert_eq!(password_data_string_with_only_password, "password123");
+    }
+}
