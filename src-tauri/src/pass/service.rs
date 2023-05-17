@@ -1,14 +1,12 @@
 use gpgme::Key;
 use rand::Rng;
 
-use crate::pass::entities::password_data::PasswordData;
-use crate::{pass::entities::file_details::FileDetails, utils::remove_last_dir};
-
-use crate::pass::error::PassError;
-
-use super::entities::folder::FolderDetailsWithChildren;
-use super::repository;
-use super::repository::file_password::open_file;
+use super::repository::{self, file_password::open_file};
+use crate::pass::entities::{
+    error::PassError, file_details::FileDetails, folder::FolderDetailsWithChildren,
+    password_data::PasswordData,
+};
+use crate::utils::remove_last_dir;
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
     let mut file_content = open_file(password_path)?;

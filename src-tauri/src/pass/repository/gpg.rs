@@ -2,7 +2,7 @@ use std::{fs::File, io::Read};
 
 use gpgme::{Context, Key, Protocol};
 
-use crate::pass::error::PassError;
+use crate::pass::entities::error::PassError;
 
 use super::file_password::open_file;
 

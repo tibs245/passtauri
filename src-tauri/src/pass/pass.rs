@@ -1,8 +1,8 @@
 use super::{
     entities::{
-        action_result::ActionResult, key_serializable::KeySerializable, password_data::PasswordData,
+        action_result::ActionResult, error::PassError, key_serializable::KeySerializable,
+        password_data::PasswordData,
     },
-    error::PassError,
     service,
 };
 

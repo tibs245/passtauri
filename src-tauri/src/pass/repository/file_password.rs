@@ -1,6 +1,6 @@
 use std::{fs, path::Path};
 extern crate dirs;
-use crate::pass::error::PassError;
+use crate::pass::entities::error::PassError;
 
 pub fn list_files_path(path: &str) -> Result<fs::ReadDir, PassError> {
     match fs::read_dir(path) {

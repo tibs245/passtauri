@@ -1,6 +1,6 @@
 use std::fs;
 extern crate dirs;
-use crate::pass::error::PassError;
+use crate::pass::entities::error::PassError;
 
 pub fn password_store_path() -> Result<String, PassError> {
     match dirs::home_dir() {

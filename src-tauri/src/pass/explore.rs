@@ -1,8 +1,7 @@
 use crate::pass::service;
 
-use super::{
-    entities::{file_details::FileDetails, folder::FolderDetailsWithChildren},
-    error::PassError,
+use super::entities::{
+    error::PassError, file_details::FileDetails, folder::FolderDetailsWithChildren,
 };
 
 #[tauri::command]
