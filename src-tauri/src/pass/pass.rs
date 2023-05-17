@@ -3,17 +3,17 @@ use super::{
         action_result::ActionResult, error::PassError, key_serializable::KeySerializable,
         password_data::PasswordData,
     },
-    service,
+    services,
 };
 
 #[tauri::command]
 pub fn read_password(password_path: &str) -> Result<PasswordData, PassError> {
-    service::get_password_data(password_path)
+    services::password::get_password_data(password_path)
 }
 
 #[tauri::command]
 pub fn generate_password(list_of_caractere: &str, size: usize) -> String {
-    service::generate_string(list_of_caractere, size)
+    services::password::generate_string(list_of_caractere, size)
 }
 
 #[tauri::command]
@@ -42,12 +42,12 @@ pub fn create_password(
         },
     };
 
-    service::create_password(password_data, path)
+    services::password::create_password(password_data, path)
 }
 
 #[tauri::command]
 pub fn init_pass_folder(path: &str, keys: Vec<&str>) -> Result<(), PassError> {
-    service::init_pass_folder(path, keys)
+    services::folder::init_pass_folder(path, keys)
 }
 
 #[tauri::command]
@@ -76,12 +76,12 @@ pub fn update_password(
         },
     };
 
-    service::update_password(password_data, password_path)
+    services::password::update_password(password_data, password_path)
 }
 
 #[tauri::command]
 pub fn delete_password(password_path: &str) -> Result<ActionResult, ActionResult> {
-    match service::delete_password(password_path) {
+    match services::password::delete_password(password_path) {
         Ok(()) => Ok(ActionResult {
             result: true,
             error: None,
@@ -95,7 +95,7 @@ pub fn delete_password(password_path: &str) -> Result<ActionResult, ActionResult
 
 #[tauri::command]
 pub fn delete_password_folder(folder_path: &str) -> Result<ActionResult, ActionResult> {
-    match service::delete_password_folder(folder_path) {
+    match services::folder::delete_password_folder(folder_path) {
         Ok(()) => Ok(ActionResult {
             result: true,
             error: None,
@@ -108,8 +108,8 @@ pub fn delete_password_folder(folder_path: &str) -> Result<ActionResult, ActionR
 }
 
 #[tauri::command]
-pub fn get_all_keys<'a>() -> Result<Vec<KeySerializable>, PassError> {
-    match service::get_all_keys() {
+pub fn get_all_keys() -> Result<Vec<KeySerializable>, PassError> {
+    match services::keys::get_all_keys() {
         Ok(keys) => Ok(keys.iter().map(KeySerializable::from).collect()),
         Err(error) => Err(error),
     }

@@ -1,4 +1,4 @@
-use crate::pass::service;
+use crate::pass::services;
 
 use super::entities::{
     error::PassError, file_details::FileDetails, folder::FolderDetailsWithChildren,
@@ -6,22 +6,22 @@ use super::entities::{
 
 #[tauri::command]
 pub fn list_password() -> Result<Vec<FileDetails>, PassError> {
-    service::list_password_path("")
+    services::explore::list_password_path("")
 }
 
 #[tauri::command]
 pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
-    service::list_password_path(path)
+    services::explore::list_password_path(path)
 }
 
 #[tauri::command]
 pub fn search_password(path: &str, search: &str) -> Result<Option<Vec<FileDetails>>, PassError> {
-    service::search_password(path, search)
+    services::explore::search_password(path, search)
 }
 
 #[tauri::command]
 pub fn get_folder_tree(path: &str) -> Result<Vec<FolderDetailsWithChildren>, PassError> {
-    match service::list_folder_tree(path) {
+    match services::explore::list_folder_tree(path) {
         Ok(tree) => Ok(tree.unwrap_or(vec![])),
         Err(error) => Err(error),
     }
