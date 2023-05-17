@@ -1,5 +1,8 @@
+import { useToastError, useToastSuccess } from "@/components/Toast";
 import WriteInputContent from "@/components/WriteInputContent";
 import { useDeletePassword, usePassword } from "@/hooks/password";
+import { TauriError } from "@/types/tauriError";
+import { isTauriError } from "@/utils";
 import { Flex, Button, Icon, Stack, Heading, Text, Spacer, Spinner, Input, Textarea, Box, InputGroup } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -9,6 +12,8 @@ import { FiEdit, FiEye, FiShield, FiTrash2 } from "react-icons/fi";
 
 
 export default function PasswordViewDetailsPage() {
+    const toastSuccess = useToastSuccess();
+    const toastError = useToastError();
     const router = useRouter();
     const password = useMemo(() => router.query.path as string[] ?? [], [router.query.path]);
 
@@ -20,9 +25,18 @@ export default function PasswordViewDetailsPage() {
 
     const { trigger, isMutating } = useDeletePassword(passwordPath);
 
-    const handleDeletePassword = () => {
-        trigger()
-        router.push('/');
+    const handleDeletePassword = async () => {
+        try {
+            await trigger()
+            toastSuccess({ title: `Password «${filename}» is deleted` });
+            router.push('/');
+        } catch (error) {
+            if (isTauriError(error)) {
+                toastError({ title: `Error on delete of «${filename}» password`, description: `${(error as TauriError)?.message}` })
+            } else {
+                console.error({ error })
+            }
+        }
     }
 
     return <>
@@ -85,5 +99,9 @@ function PasswordDetails({ passwordPath }: PasswordDetailsProps) {
             <Textarea value={password?.extra ?? ''} isReadOnly />
         </Box>
     </Stack>
+}
+
+function toastError(arg0: { title: string; description: string; }) {
+    throw new Error("Function not implemented.");
 }
 

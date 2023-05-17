@@ -4,7 +4,6 @@ import { TauriFetcher, TauriFetcherArgs } from '@/hooks/config'
 import { PassFile } from '@/types/file'
 import { Password, PasswordWithPath } from '@/types/password'
 import { useSWRConfig } from "swr";
-import { ActionResult } from '@/types/actionResult'
 import { TauriError } from '@/types/tauriError'
 
 export const useListPassword = (path = "", options = {}) => useSWR<PassFile[], TauriError>(
@@ -29,7 +28,7 @@ export const usePassword = (passwordPath: string | null, options = {}) => {
 export const useDeletePassword = (passwordPath: string | null, options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs | null>(
+    return useSWRMutation<null, TauriError, TauriFetcherArgs | null>(
         passwordPath ? { command: 'delete_password', args: { passwordPath } } : null,
         TauriFetcher,
         {
@@ -46,7 +45,7 @@ export const useDeletePassword = (passwordPath: string | null, options = {}) => 
 export const useCreatePassword = (options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, PasswordWithPath>(
+    return useSWRMutation<null, TauriError, TauriFetcherArgs, PasswordWithPath>(
         { command: 'create_password', args: {} },
         TauriFetcher,
         {
@@ -63,7 +62,7 @@ export const useCreatePassword = (options = {}) => {
 export const useUpdatePassword = (passwordPath: string, options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, Password>(
+    return useSWRMutation<null, TauriError, TauriFetcherArgs, Password>(
         { command: 'update_password', args: { path: passwordPath } },
         TauriFetcher,
         {

@@ -15,6 +15,7 @@ pub enum PassError {
     PasswordFileAlreadyExists,
     EnableParseContentToString(Error),
     PathNotInPasswordStorePath,
+    UnableToUpdatePasswordNotExists(String),
 }
 impl From<&PassError> for String {
     fn from(pass_error: &PassError) -> String {
@@ -26,31 +27,34 @@ impl From<&PassError> for String {
                 format!("Unable to read path {} because : {}", path, error_path)
             }
             PassError::OpenPgpProtocolNotFound => {
-                "Impossible use Openpgp protocol : It's installed ?".to_string()
+                "Unable use Openpgp protocol : It's installed ?".to_string()
             }
             PassError::UnableToOpenFile(error) => {
-                format!("Impossible to open password file : {}", error)
+                format!("Unable to open password file : {}", error)
             }
             PassError::UnableToWritePasswordFile(error) => {
-                format!("Impossible to write password file : {}", error)
+                format!("Unable to write password file : {}", error)
             }
             PassError::UnableToDeletePasswordFile(error) => {
-                format!("Impossible to delete password file : {}", error)
+                format!("Unable to delete password file : {}", error)
             }
             PassError::UnableToWriteGpgKeyFile(error) => {
-                format!("Impossible to write gpg key file : {}", error)
+                format!("Unable to write gpg key file : {}", error)
             }
             PassError::KeyNotFound(error) => {
-                format!("Impossible de trouver la clef : {}", error)
+                format!("Unable de trouver la clef : {}", error)
             }
             PassError::PasswordFileAlreadyExists => {
-                "Impossible create password if already exists".to_string()
+                "Unable create password if already exists".to_string()
             }
             PassError::EnableParseContentToString(error) => {
                 format!("Enable to parse content to string : {}", error)
             }
             PassError::PathNotInPasswordStorePath => {
                 "Path is not in password-store path".to_string()
+            }
+            PassError::UnableToUpdatePasswordNotExists(password_path) => {
+                format!("Unable to update password don't exists : {}", password_path)
             }
         }
     }

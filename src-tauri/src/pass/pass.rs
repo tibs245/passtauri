@@ -1,8 +1,5 @@
 use super::{
-    entities::{
-        action_result::ActionResult, error::PassError, key_serializable::KeySerializable,
-        password_data::PasswordData,
-    },
+    entities::{error::PassError, key_serializable::KeySerializable, password_data::PasswordData},
     services,
 };
 
@@ -52,7 +49,7 @@ pub fn init_pass_folder(path: &str, keys: Vec<&str>) -> Result<(), PassError> {
 
 #[tauri::command]
 pub fn update_password(
-    password_path: &str,
+    path: &str,
     name: &str,
     password: &str,
     username: Option<&str>,
@@ -76,35 +73,17 @@ pub fn update_password(
         },
     };
 
-    services::password::update_password(password_data, password_path)
+    services::password::update_password(password_data, path)
 }
 
 #[tauri::command]
-pub fn delete_password(password_path: &str) -> Result<ActionResult, ActionResult> {
-    match services::password::delete_password(password_path) {
-        Ok(()) => Ok(ActionResult {
-            result: true,
-            error: None,
-        }),
-        Err(error) => Err(ActionResult {
-            result: false,
-            error: Some(error.into()),
-        }),
-    }
+pub fn delete_password(password_path: &str) -> Result<(), PassError> {
+    services::password::delete_password(password_path)
 }
 
 #[tauri::command]
-pub fn delete_password_folder(folder_path: &str) -> Result<ActionResult, ActionResult> {
-    match services::folder::delete_password_folder(folder_path) {
-        Ok(()) => Ok(ActionResult {
-            result: true,
-            error: None,
-        }),
-        Err(error) => Err(ActionResult {
-            result: false,
-            error: Some(error.into()),
-        }),
-    }
+pub fn delete_password_folder(folder_path: &str) -> Result<(), PassError> {
+    services::folder::delete_password_folder(folder_path)
 }
 
 #[tauri::command]

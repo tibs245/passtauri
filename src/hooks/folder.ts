@@ -1,7 +1,6 @@
 import useSWRMutation from 'swr/mutation'
 import { TauriFetcher, TauriFetcherArgs } from '@/hooks/config'
 import useSWR, { useSWRConfig } from "swr";
-import { ActionResult } from '@/types/actionResult'
 import { PassFile, PassFolder } from '@/types/file';
 import { TauriError } from '@/types/tauriError';
 
@@ -20,7 +19,7 @@ export type PassFileParams = {
 export const useCreatePasswordFolder = (options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs, PassFileParams>(
+    return useSWRMutation<null, TauriError, TauriFetcherArgs, PassFileParams>(
         { command: 'init_pass_folder', args: {} },
         TauriFetcher,
         {
@@ -37,7 +36,7 @@ export const useCreatePasswordFolder = (options = {}) => {
 export const useDeletePasswordFolder = (folderPath: string | null, options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation<ActionResult, ActionResult, TauriFetcherArgs | null>(
+    return useSWRMutation<null, TauriError, TauriFetcherArgs | null>(
         folderPath ? { command: 'delete_password_folder', args: { folderPath } } : null,
         TauriFetcher,
         {

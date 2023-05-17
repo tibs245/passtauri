@@ -2,13 +2,13 @@ use rand::Rng;
 
 use crate::pass::{
     entities::{error::PassError, password_data::PasswordData},
-    repository::{self, file_password::open_file},
+    repository,
 };
 
 use super::keys::encrypt_password;
 
 pub fn get_password_data(password_path: &str) -> Result<PasswordData, PassError> {
-    let mut file_content = open_file(password_path)?;
+    let mut file_content = repository::file_password::open_file(password_path)?;
     let password_data = repository::gpg::decrypt_password_file(&mut file_content)?;
 
     Ok(PasswordData {
@@ -31,6 +31,12 @@ pub fn create_password(password_data: PasswordData, path: &str) -> Result<(), Pa
 }
 
 pub fn update_password(password_data: PasswordData, password_path: &str) -> Result<(), PassError> {
+    if !repository::file_password::is_file_exist(password_path) {
+        return Err(PassError::UnableToUpdatePasswordNotExists(
+            password_path.to_string(),
+        ));
+    }
+
     let password_old_name = password_path
         .to_string()
         .split('/')

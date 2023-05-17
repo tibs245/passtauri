@@ -6,8 +6,13 @@ import PasswordForm from "@/components/PasswordForm"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import Link from "next/link"
+import { useToastError, useToastSuccess } from "@/components/Toast"
+import { TauriError } from "@/types/tauriError"
+import { isTauriError } from "@/utils"
 
 export default function PasswordEditionForm() {
+    const toastSuccess = useToastSuccess();
+    const toastError = useToastError();
     const router = useRouter();
     const passwordQuery = useMemo(() => router.query.path as string[] ?? [], [router.query.path]);
 
@@ -22,8 +27,17 @@ export default function PasswordEditionForm() {
     const goBack = () => router.push(`/password/view${passwordPath}`)
 
     const handleUpdatePassword = async (password: Password) => {
-        await triggerUpdatePassword(password);
-        goBack()
+        try {
+            await triggerUpdatePassword(password);
+            toastSuccess({ title: `Password «${password.name}» is updated` });
+            goBack()
+        } catch (error: unknown) {
+            if (isTauriError(error)) {
+                toastError({ title: `Error on update of «${password.name}» password`, description: `${(error as TauriError)?.message}` })
+            } else {
+                console.error({ error })
+            }
+        }
     }
 
     const handleDeletePassword = () => {
