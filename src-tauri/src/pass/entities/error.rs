@@ -16,6 +16,10 @@ pub enum PassError {
     EnableParseContentToString(Error),
     PathNotInPasswordStorePath,
     UnableToUpdatePasswordNotExists(String),
+    FolderToUpdateNotExists(String),
+    UnableMoveFolderIfDestinationAlreadyExists(String),
+    FsExtraErrorOnMoveFolder(fs_extra::error::Error),
+    FsErrorOnMoveFolder(Error),
 }
 impl From<&PassError> for String {
     fn from(pass_error: &PassError) -> String {
@@ -56,6 +60,17 @@ impl From<&PassError> for String {
             PassError::UnableToUpdatePasswordNotExists(password_path) => {
                 format!("Unable to update password don't exists : {}", password_path)
             }
+            PassError::FolderToUpdateNotExists(folder_path) => {
+                format!("Unable to update folder don't exists : {}", folder_path)
+            }
+            PassError::UnableMoveFolderIfDestinationAlreadyExists(folder_path) => {
+                format!(
+                    "Unable to move folder. Already file or folder on destination : {}",
+                    folder_path
+                )
+            }
+            PassError::FsExtraErrorOnMoveFolder(_) => "Error on move folder".to_string(),
+            PassError::FsErrorOnMoveFolder(_) => "Error on move folder".to_string(),
         }
     }
 }
