@@ -2,6 +2,8 @@ use std::io::Error;
 
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 
+use super::file_details::ParseFileDetailsErr;
+
 #[derive(Debug)]
 pub enum PassError {
     PasswordStorePathNotFound,
@@ -20,6 +22,8 @@ pub enum PassError {
     UnableMoveFolderIfDestinationAlreadyExists(String),
     FsExtraErrorOnMoveFolder(fs_extra::error::Error),
     FsErrorOnMoveFolder(Error),
+    FolderDontExists(String),
+    UnableParseFileDetailsFromStr(ParseFileDetailsErr),
 }
 impl From<&PassError> for String {
     fn from(pass_error: &PassError) -> String {
@@ -71,6 +75,12 @@ impl From<&PassError> for String {
             }
             PassError::FsExtraErrorOnMoveFolder(_) => "Error on move folder".to_string(),
             PassError::FsErrorOnMoveFolder(_) => "Error on move folder".to_string(),
+            PassError::FolderDontExists(path) => {
+                format!("Folder {} don't exists", path)
+            }
+            PassError::UnableParseFileDetailsFromStr(error) => {
+                format!("Error on parse file details from path : {:?}", error)
+            }
         }
     }
 }

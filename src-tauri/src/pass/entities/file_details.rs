@@ -1,5 +1,7 @@
 use std::{
     fs::{DirEntry, FileType},
+    path::Path,
+    str::FromStr,
     time::SystemTime,
 };
 
@@ -10,6 +12,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 pub enum FileTypeAPI {
     DIRECTORY,
     FILE,
+    None,
 }
 
 impl From<FileTypeAPI> for String {
@@ -17,6 +20,7 @@ impl From<FileTypeAPI> for String {
         match file_type {
             FileTypeAPI::DIRECTORY => "DIRECTORY".to_string(),
             FileTypeAPI::FILE => "FILE".to_string(),
+            FileTypeAPI::None => "NONE".to_string(),
         }
     }
 }
@@ -24,6 +28,18 @@ impl From<FileTypeAPI> for String {
 impl From<FileType> for FileTypeAPI {
     fn from(file_type: FileType) -> FileTypeAPI {
         if file_type.is_dir() {
+            FileTypeAPI::DIRECTORY
+        } else {
+            FileTypeAPI::FILE
+        }
+    }
+}
+
+impl From<&Path> for FileTypeAPI {
+    fn from(file_path: &Path) -> FileTypeAPI {
+        if !file_path.exists() {
+            FileTypeAPI::None
+        } else if file_path.is_dir() {
             FileTypeAPI::DIRECTORY
         } else {
             FileTypeAPI::FILE
@@ -63,6 +79,38 @@ impl From<&DirEntry> for FileDetails {
 impl From<DirEntry> for FileDetails {
     fn from(file_data: DirEntry) -> FileDetails {
         FileDetails::from(&file_data)
+    }
+}
+
+#[derive(Debug)]
+pub enum ParseFileDetailsErr {
+    NotFound,
+}
+// TODO : Add test
+impl FromStr for FileDetails {
+    type Err = ParseFileDetailsErr;
+    fn from_str(path_str: &str) -> Result<FileDetails, Self::Err> {
+        let path = Path::new(path_str);
+
+        if !path.exists() {
+            return Err(ParseFileDetailsErr::NotFound);
+        }
+
+        let mut directory_last_modified = SystemTime::UNIX_EPOCH;
+
+        if let Ok(metadata) = path.metadata() {
+            if let Ok(last_modified) = metadata.modified() {
+                directory_last_modified = last_modified;
+            }
+        }
+
+        Ok(FileDetails {
+            filename: path.file_name().unwrap().to_string_lossy().to_string(),
+            path: path.canonicalize().unwrap().to_string_lossy().to_string(),
+            filetype: path.into(),
+            last_modified: directory_last_modified,
+            encrypt_keys_id: None,
+        })
     }
 }
 

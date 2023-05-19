@@ -26,3 +26,8 @@ pub fn get_folder_tree(path: &str) -> Result<Vec<FolderDetailsWithChildren>, Pas
         Err(error) => Err(error),
     }
 }
+
+#[tauri::command]
+pub fn get_folder(path: &str) -> Result<FileDetails, PassError> {
+    services::folder::get_folder(path)
+}
