@@ -1,6 +1,24 @@
 import { KeyOption } from "@/types/key";
 import { Text, Stack } from "@chakra-ui/react";
 import { SelectComponentsConfig, GroupBase, chakraComponents } from "chakra-react-select";
+import { useKeys } from "@/hooks/opengpg";
+import { useMemo } from "react"
+
+export const useKeysOptions = () => {
+    const { data: keysAvailable } = useKeys();
+
+    return useMemo((): KeyOption[] => (
+        keysAvailable?.map(key => ({
+            label: key.user?.[0].name + ' - ' + key.user?.[0].email,
+            value: key.fingerprint ?? '',
+            trust: key.ownerTrust,
+            isInvalid: key.isInvalid,
+            isExpired: key.isExpired,
+            isRevoked: key.isRevoked,
+            isDisabled: key.isDisabled
+        })) ?? []),
+        [keysAvailable])
+}
 
 export const OptionKeyComponent: SelectComponentsConfig<
     KeyOption,

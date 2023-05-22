@@ -1,5 +1,5 @@
-import { OptionFolderComponent } from "@/components/Select/folderOption";
-import { OptionKeyComponent } from "@/components/Select/keyOption";
+import { OptionFolderComponent, usePathOptions } from "@/components/Select/folderOption";
+import { OptionKeyComponent, useKeysOptions } from "@/components/Select/keyOption";
 import { GroupBase, Props, Select, SelectInstance } from "chakra-react-select";
 import { RefAttributes } from "react";
 import { FieldValues, UseControllerProps, useController } from "react-hook-form";
@@ -32,4 +32,4 @@ export default function ControlledSelect<T extends FieldValues, Option = unknown
     );
 };
 
-export { OptionKeyComponent, OptionFolderComponent }
+export { OptionKeyComponent, OptionFolderComponent, useKeysOptions, usePathOptions }

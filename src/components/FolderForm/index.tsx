@@ -1,12 +1,8 @@
-import { Button, Stack, Text, Input, Box, InputGroup, InputRightElement, FormControl, FormErrorMessage } from "@chakra-ui/react";
+import { Button, Stack, Text, Input, Box, InputGroup, FormControl, FormErrorMessage } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FolderOption, PassFile, PassFolder } from "@/types/file";
-import { useTreeFolder } from "@/hooks/folder";
-import Select, { OptionFolderComponent, OptionKeyComponent } from "@/components/Select";
-import { useMemo } from "react";
-import { useKeys } from "@/hooks/opengpg";
+import Select, { OptionFolderComponent, OptionKeyComponent, usePathOptions, useKeysOptions } from "@/components/Select";
 import { KeyOption, KeyOptionNewUnknowKey } from "@/types/key";
-
 
 type FolderFormProps = {
     folderFile: PassFolder,
@@ -14,7 +10,6 @@ type FolderFormProps = {
     isMutating: boolean,
     onCancel?: () => void
 }
-
 
 type PassFolderFormValues = Omit<PassFile, "path" | "encryptKeysId"> & {
     filetype: "DIRECTORY";
@@ -31,7 +26,6 @@ const passFolderFromPassFolderFormValues = ({ path, encryptKeysId, ...rest }: Pa
     }
 }
 
-
 const passFolderFormValuesFromPassFolder = ({ path, encryptKeysId, ...rest }: PassFolder, pathOptions: FolderOption[], KeyOptions: KeyOption[]): PassFolderFormValues => {
     return {
         path: pathOptions?.find(p => p.value === path),
@@ -40,29 +34,9 @@ const passFolderFormValuesFromPassFolder = ({ path, encryptKeysId, ...rest }: Pa
     }
 }
 
-const mapFolderAndChildren = (passFolder: PassFolder, parents: string[] = []): FolderOption[] => {
-    const folder = { value: passFolder.path, label: [...parents, passFolder.filename].join('/'), depth: parents.length, parents: parents.join('/'), name: passFolder.filename }
-    const children = passFolder?.children?.map((child) => mapFolderAndChildren(child, [...parents, passFolder.filename]))?.flat() ?? []
-
-    return [folder, ...children]
-}
-
 export default function FolderForm({ folderFile, isMutating, onSubmit, onCancel }: FolderFormProps) {
-    const { data: keysAvailable } = useKeys();
-    const { data: treeFolder } = useTreeFolder();
-
-    const pathOptions = useMemo(() => [{ value: (process.env.NEXT_PUBLIC_PASSWORD_STORE ?? ''), depth: 0, label: 'Home : /', name: 'Home : /', parents: '' }, ...(treeFolder?.map((child) => mapFolderAndChildren(child)).flat() ?? [])], [treeFolder])
-    const keysOptions = useMemo((): KeyOption[] => (
-        keysAvailable?.map(key => ({
-            label: key.user?.[0].name + ' - ' + key.user?.[0].email,
-            value: key.fingerprint ?? '', trust: key.ownerTrust,
-            isInvalid: key.isInvalid,
-            isExpired: key.isExpired,
-            isRevoked: key.isRevoked,
-            isDisabled: key.isDisabled
-        })) ?? []),
-        [keysAvailable])
-
+    const pathOptions = usePathOptions();
+    const keysOptions = useKeysOptions();
 
     const { control, register, handleSubmit, formState: { errors } } = useForm<PassFolderFormValues>({
         defaultValues: {
