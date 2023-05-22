@@ -36,7 +36,7 @@ pub fn update_pass_folder(
 ) -> Result<(), PassError> {
     if !repository::file_password::is_file_exist(actual_path) {
         return Err(PassError::FolderToUpdateNotExists(actual_path.to_string()));
-    } else if actual_path != new_path && !repository::file_password::is_file_exist(new_path) {
+    } else if actual_path != new_path && repository::file_password::is_file_exist(new_path) {
         return Err(PassError::UnableMoveFolderIfDestinationAlreadyExists(
             new_path.to_string(),
         ));

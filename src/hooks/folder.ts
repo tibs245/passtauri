@@ -1,21 +1,22 @@
 import useSWRMutation from 'swr/mutation'
 import { TauriFetcher, TauriFetcherArgs } from '@/hooks/config'
-import useSWR, { useSWRConfig } from "swr";
+import useSWR, { SWRConfiguration, useSWRConfig } from "swr";
 import { PassFile, PassFolder } from '@/types/file';
 import { TauriError } from '@/types/tauriError';
 
 
-export const useFolder = (options = {}) => useSWR<PassFolder, TauriError>(
-    { _key: "get_folder", command: 'get_folder', args: {} },
+export const useFolder = (path: string, options = {}) => useSWR<PassFolder, TauriError>(
+    { _key: "get_folder", command: 'get_folder', args: { path } },
     TauriFetcher,
     options
 )
 
-export const useTreeFolder = (options = {}) => useSWR<PassFolder[], TauriError>(
-    { _key: "list_password_path", command: 'get_folder_tree', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE } },
-    TauriFetcher,
-    options
-)
+export const useTreeFolder = (options: SWRConfiguration<PassFolder[], TauriError> = {}) => 
+    useSWR<PassFolder[], TauriError>(
+        { _key: "list_password_path", command: 'get_folder_tree', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE } },
+        TauriFetcher,
+        options
+    )
 
 export type PassFolderParams = {
     path: string;
@@ -40,15 +41,15 @@ export const useCreatePasswordFolder = (options = {}) => {
 }
 
 export type PassFolderUpdateParams = {
-    new_path: string;
+    newPath: string;
     keys: string[];
 };
 
 export const useUpdatePasswordFolder = (path: string, options = {}) => {
     const { mutate } = useSWRConfig()
 
-    return useSWRMutation<null, TauriError, TauriFetcherArgs, PassFolderParams>(
-        { command: 'update_pass_folder', args: { actual_path: path } },
+    return useSWRMutation<null, TauriError, TauriFetcherArgs, PassFolderUpdateParams>(
+        { command: 'update_pass_folder', args: { actualPath: path } },
         TauriFetcher,
         {
             onSuccess: () => {

@@ -1,8 +1,9 @@
 import FolderItem from "@/components/FolderItem";
+import Loading from "@/components/Loading";
 import PasswordItem from "@/components/PasswordItem";
 import { useListPassword } from "@/hooks/password";
 import { PassFile } from "@/types/file";
-import { Stack, StackDivider, StackProps, Text } from "@chakra-ui/react";
+import { Flex, Spinner, Stack, StackDivider, StackProps, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
 export type PasswordListProps = StackProps & {
@@ -23,7 +24,7 @@ export default function PasswordList({ path, onClickFolder, ...rest }: PasswordL
     }
 
     if (isLoading) {
-        return <Text>Read secret folder 🫣 ..</Text>
+        return <Loading />
     }
 
     return <Stack

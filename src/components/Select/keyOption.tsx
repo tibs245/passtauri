@@ -1,23 +1,35 @@
-import { KeyOption } from "@/types/key";
+import { Key, KeyOption } from "@/types/key";
 import { Text, Stack } from "@chakra-ui/react";
 import { SelectComponentsConfig, GroupBase, chakraComponents } from "chakra-react-select";
 import { useKeys } from "@/hooks/opengpg";
 import { useMemo } from "react"
+import { SWRConfiguration } from "swr";
+import { TauriError } from "@/types/tauriError";
 
-export const useKeysOptions = () => {
-    const { data: keysAvailable } = useKeys();
+export const useKeysOptions = (options: SWRConfiguration<Key[], TauriError> = {}) => {
+    const {
+        data: keysAvailable,
+        isLoading: isKeysOptionsLoading,
+        isValidating: isKeysOptionsValidating,
+        error: errorKeysOptions
+    } = useKeys({ revalidateOnFocus: false, revalidateOnReconnect: false, ...options ?? {} });
 
-    return useMemo((): KeyOption[] => (
-        keysAvailable?.map(key => ({
-            label: key.user?.[0].name + ' - ' + key.user?.[0].email,
-            value: key.fingerprint ?? '',
-            trust: key.ownerTrust,
-            isInvalid: key.isInvalid,
-            isExpired: key.isExpired,
-            isRevoked: key.isRevoked,
-            isDisabled: key.isDisabled
-        })) ?? []),
-        [keysAvailable])
+    return {
+        isKeysOptionsLoading,
+        isKeysOptionsValidating,
+        errorKeysOptions,
+        keysOptions: useMemo((): KeyOption[] => (
+            keysAvailable?.map(key => ({
+                label: key.user?.[0].name + ' - ' + key.user?.[0].email,
+                value: key.fingerprint ?? '',
+                trust: key.ownerTrust,
+                isInvalid: key.isInvalid,
+                isExpired: key.isExpired,
+                isRevoked: key.isRevoked,
+                isDisabled: key.isDisabled
+            })) ?? []),
+            [keysAvailable])
+    }
 }
 
 export const OptionKeyComponent: SelectComponentsConfig<

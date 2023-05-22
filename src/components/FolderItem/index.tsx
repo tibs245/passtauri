@@ -2,6 +2,7 @@ import { useDeletePasswordFolder } from "@/hooks/folder";
 import { useKeys } from "@/hooks/opengpg"
 import { PassFile } from "@/types/file";
 import { Spacer, Stack, Icon, Text, StackProps, Popover, PopoverTrigger, Button, PopoverContent, PopoverCloseButton, PopoverHeader, PopoverBody, PopoverArrow, useDisclosure, UseDisclosureProps } from "@chakra-ui/react";
+import Link from "next/link";
 import { useState } from "react";
 import { FiArrowRightCircle, FiFolder, FiEdit, FiTrash2, FiAlertTriangle } from "react-icons/fi"
 
@@ -45,7 +46,7 @@ export default function FolderItem({ children, folder, ...rest }: FolderItemProp
             <PopoverArrow />
             <PopoverBody>
                 <Stack>
-                    <Button colorScheme="brand" leftIcon={<Icon as={FiEdit} />} isDisabled>Modifier</Button>
+                    <Button as={Link} colorScheme="brand" leftIcon={<Icon as={FiEdit} />} href={'/folder/edit' + folder.path} onClick={() => onToggle()}>Modifier</Button>
                     {isConfirmDelete ?
                         <Button colorScheme="red" leftIcon={<Icon as={FiAlertTriangle} />} onClick={handleDeletePassword} isLoading={isMutating}>Sure ?</Button>
                         :
