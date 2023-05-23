@@ -22,7 +22,7 @@ export default function PasswordEditionForm() {
 
     const handleCreatePassword = async (password: Password) => {
         try {
-            const pathToSave = (process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '') + defaultPath.join('/') + password.name + '.gpg'
+            const pathToSave = process.env.NEXT_PUBLIC_PASSWORD_STORE + '/' + defaultPath.join('/') + password.name + '.gpg'
             await triggerCreatePassword({ ...password, path: pathToSave });
             toastSuccess({ title: `Password «${password.name}» is created` });
             router.push('/password/view' + pathToSave);

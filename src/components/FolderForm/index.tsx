@@ -39,6 +39,7 @@ const passFolderFromPassFolderFormValues = ({ path, encryptKeysId, ...rest }: Pa
 const passFolderFormValuesFromPassFolder = ({ path, encryptKeysId, ...rest }: PassFolder, pathOptions: FolderOption[], KeyOptions: KeyOption[]): PassFolderFormValues => {
     const pathArray = path.split('/')
     const parentPath = pathArray?.slice(0, pathArray.length - 1)?.join('/')
+
     return {
         path: pathOptions?.find(p => p.value === parentPath),
         encryptKeysId: encryptKeysId?.map(keyId => KeyOptions.find(k => k.value === keyId) ?? KeyOptionNewUnknowKey(keyId)) ?? [],

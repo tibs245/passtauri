@@ -25,7 +25,7 @@ export const usePathOptions = (options: SWRConfiguration<PassFolder[], TauriErro
         isPathOptionsValidating,
         errorPathOptions,
         pathOptions: useMemo(() => [{
-            value: (process.env.NEXT_PUBLIC_PASSWORD_STORE?.slice(0, -1) ?? ''),
+            value: (process.env.NEXT_PUBLIC_PASSWORD_STORE ?? ''),
             depth: 0,
             label: 'Home : /',
             name: 'Home : /',

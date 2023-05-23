@@ -34,7 +34,7 @@ export default function FolderCreateForm() {
     }
 
     const defaultFolder: PassFolder = {
-        path: defaultPath.join('/'),
+        path: (process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '') + '/' + (defaultPath?.length ? [...defaultPath, ''].join('/') : ""),
         filetype: "DIRECTORY",
         filename: "",
     }

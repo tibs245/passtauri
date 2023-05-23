@@ -7,13 +7,13 @@ import { useSWRConfig } from "swr";
 import { TauriError } from '@/types/tauriError'
 
 export const useListPassword = (path = "", options = {}) => useSWR<PassFile[], TauriError>(
-        { _key: "list_password_path", command: 'list_password_path', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path } },
+        { _key: "list_password_path", command: 'list_password_path', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + '/' + path } },
         TauriFetcher,
         options
     )
 
 export const useSearchPassword = (path = "", search = "", options = {}) => useSWR<PassFile[], TauriError>(
-        { _key: "search_password", command: 'search_password', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + path, search } },
+        { _key: "search_password", command: 'search_password', args: { path: process.env.NEXT_PUBLIC_PASSWORD_STORE + '/' + path, search } },
         TauriFetcher,
         options
     )

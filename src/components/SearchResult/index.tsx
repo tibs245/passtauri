@@ -16,7 +16,7 @@ export default function SearchResult({ path, searchWord, onClickFolder, ...rest 
     const { data: listPassword, isLoading, error } = useSearchPassword(path.join('/'), searchWord);
 
     const handleClickFolder = (PassFile: PassFile) => {
-        onClickFolder?.(PassFile.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', ''));
+        onClickFolder?.(PassFile.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE + '/', ''));
     }
 
     if (error) {
@@ -38,7 +38,7 @@ export default function SearchResult({ path, searchWord, onClickFolder, ...rest 
                 folder={password}
             >
                 <Stack spacing={0}>
-                    <Text fontSize="xs" color="gray.600">{password.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', '').replace(password?.filename ?? '', '')}</Text>
+                    <Text fontSize="xs" color="gray.600">{password.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE + '/', '').replace(password?.filename ?? '', '')}</Text>
                     <Text>{password.filename}</Text>
                 </Stack>
             </FolderItem> :
@@ -46,7 +46,7 @@ export default function SearchResult({ path, searchWord, onClickFolder, ...rest 
                 _hover={{ backgroundColor: 'gray.100' }}
                 onClick={() => router.push(`/password/${encodeURIComponent(password.path)}`)}>
                 <Stack spacing={0}>
-                    <Text fontSize="xs" color="gray.600">{password.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', '').replace(password?.filename ?? '', '')}</Text>
+                    <Text fontSize="xs" color="gray.600">{password.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE + '/', '').replace(password?.filename ?? '', '')}</Text>
                     <Text>{password.filename}</Text>
                 </Stack>
             </PasswordItem>)}

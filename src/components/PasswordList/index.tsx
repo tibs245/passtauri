@@ -3,7 +3,7 @@ import Loading from "@/components/Loading";
 import PasswordItem from "@/components/PasswordItem";
 import { useListPassword } from "@/hooks/password";
 import { PassFile } from "@/types/file";
-import { Flex, Spinner, Stack, StackDivider, StackProps, Text } from "@chakra-ui/react";
+import { Stack, StackDivider, StackProps, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
 export type PasswordListProps = StackProps & {
@@ -16,7 +16,7 @@ export default function PasswordList({ path, onClickFolder, ...rest }: PasswordL
     const { data: listPassword, isLoading, error } = useListPassword(path.join('/'));
 
     const handleClickFolder = (PassFile: PassFile) => {
-        onClickFolder?.(PassFile.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '', ''));
+        onClickFolder?.(PassFile.path.replace(process.env.NEXT_PUBLIC_PASSWORD_STORE + '/', ''));
     }
 
     if (error) {
