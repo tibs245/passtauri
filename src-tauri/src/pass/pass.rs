@@ -43,8 +43,12 @@ pub fn create_password(
 }
 
 #[tauri::command]
-pub fn init_pass_folder(path: &str, keys: Vec<&str>) -> Result<(), PassError> {
-    services::folder::init_pass_folder(path, keys)
+pub fn init_pass_folder(
+    path: &str,
+    keys: Vec<&str>,
+    has_parent_keys: bool,
+) -> Result<(), PassError> {
+    services::folder::init_pass_folder(path, keys, has_parent_keys)
 }
 
 #[tauri::command]
@@ -52,8 +56,9 @@ pub fn update_pass_folder(
     actual_path: &str,
     new_path: &str,
     keys: Vec<&str>,
+    has_parent_keys: bool,
 ) -> Result<(), PassError> {
-    services::folder::update_pass_folder(actual_path, new_path, keys)
+    services::folder::update_pass_folder(actual_path, new_path, keys, has_parent_keys)
 }
 
 #[tauri::command]

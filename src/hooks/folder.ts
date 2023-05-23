@@ -5,7 +5,7 @@ import { PassFile, PassFolder } from '@/types/file';
 import { TauriError } from '@/types/tauriError';
 
 
-export const useFolder = (path: string, options = {}) => useSWR<PassFolder, TauriError>(
+export const useFolder = (path?: string, options = {}) => useSWR<PassFolder, TauriError>(
     { _key: "get_folder", command: 'get_folder', args: { path } },
     TauriFetcher,
     options
@@ -21,6 +21,7 @@ export const useTreeFolder = (options: SWRConfiguration<PassFolder[], TauriError
 export type PassFolderParams = {
     path: string;
     keys: string[];
+    hasParentKeys: boolean;
 };
 
 export const useCreatePasswordFolder = (options = {}) => {
@@ -43,6 +44,7 @@ export const useCreatePasswordFolder = (options = {}) => {
 export type PassFolderUpdateParams = {
     newPath: string;
     keys: string[];
+    hasParentKeys: boolean;
 };
 
 export const useUpdatePasswordFolder = (path: string, options = {}) => {

@@ -5,8 +5,11 @@ use std::{
     time::SystemTime,
 };
 
-use crate::utils;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
+
+use crate::utils;
+
+use super::{error::PassError, pass_item::PassItem};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum FileTypeAPI {
@@ -52,10 +55,36 @@ pub struct FileDetails {
     pub path: String,
     pub filetype: FileTypeAPI,
     pub last_modified: SystemTime,
+    pub has_parent_keys: bool,
     pub encrypt_keys_id: Option<Vec<String>>,
 }
 
 impl FileDetails {
+    fn new(path: &Path) -> Result<FileDetails, PassError> {
+        if !path.exists() {
+            return Err(PassError::PathNotFound(path.to_string_lossy().to_string()));
+        }
+
+        let mut directory_last_modified = SystemTime::UNIX_EPOCH;
+
+        if let Ok(metadata) = path.metadata() {
+            if let Ok(last_modified) = metadata.modified() {
+                directory_last_modified = last_modified;
+            }
+        }
+
+        let pass_item = PassItem::new(path);
+
+        Ok(FileDetails {
+            filename: path.file_name().unwrap().to_string_lossy().to_string(),
+            path: path.canonicalize().unwrap().to_string_lossy().to_string(),
+            filetype: path.into(),
+            last_modified: directory_last_modified,
+            encrypt_keys_id: pass_item.default_keys_gpg_id().unwrap(),
+            has_parent_keys: pass_item.has_parent_keys(),
+        })
+    }
+
     pub fn is_cached(&self) -> bool {
         self.filename.chars().next().unwrap() == '.'
     }
@@ -63,22 +92,13 @@ impl FileDetails {
 
 impl From<&DirEntry> for FileDetails {
     fn from(file_data: &DirEntry) -> FileDetails {
-        FileDetails {
-            filename: file_data.file_name().to_string_lossy().to_string(),
-            path: file_data.path().to_string_lossy().to_string(),
-            filetype: file_data.file_type().unwrap().into(),
-            last_modified: match file_data.metadata().unwrap().modified() {
-                Ok(value) => value,
-                Err(_) => SystemTime::UNIX_EPOCH,
-            },
-            encrypt_keys_id: None,
-        }
+        Self::new(&file_data.path()).unwrap()
     }
 }
 
 impl From<DirEntry> for FileDetails {
     fn from(file_data: DirEntry) -> FileDetails {
-        FileDetails::from(&file_data)
+        Self::new(&file_data.path()).unwrap()
     }
 }
 
@@ -90,47 +110,30 @@ pub enum ParseFileDetailsErr {
 impl FromStr for FileDetails {
     type Err = ParseFileDetailsErr;
     fn from_str(path_str: &str) -> Result<FileDetails, Self::Err> {
-        let path = Path::new(path_str);
-
-        if !path.exists() {
-            return Err(ParseFileDetailsErr::NotFound);
+        match Self::new(Path::new(path_str)) {
+            Ok(result) => Ok(result),
+            Err(_) => Err(ParseFileDetailsErr::NotFound),
         }
-
-        let mut directory_last_modified = SystemTime::UNIX_EPOCH;
-
-        if let Ok(metadata) = path.metadata() {
-            if let Ok(last_modified) = metadata.modified() {
-                directory_last_modified = last_modified;
-            }
-        }
-
-        Ok(FileDetails {
-            filename: path.file_name().unwrap().to_string_lossy().to_string(),
-            path: path.canonicalize().unwrap().to_string_lossy().to_string(),
-            filetype: path.into(),
-            last_modified: directory_last_modified,
-            encrypt_keys_id: None,
-        })
     }
 }
-
-// This is what #[derive(Serialize)] would generate.
 
 impl Serialize for FileDetails {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let mut s = serializer.serialize_struct("FileDetails", 5)?;
+        let mut s = serializer.serialize_struct("FileDetails", 6)?;
         s.serialize_field("filename", &self.filename)?;
         s.serialize_field("path", &self.path)?;
         s.serialize_field("filetype", &String::from(self.filetype.clone()))?;
         s.serialize_field("lastModified", &utils::iso8601(&self.last_modified))?;
+        s.serialize_field("hasParentKeys", &self.has_parent_keys)?;
         s.serialize_field("encryptKeysId", &self.encrypt_keys_id)?;
         s.end()
     }
 }
 
+#[cfg(test)]
 mod test {
     use super::*;
     use std::env;
@@ -143,6 +146,7 @@ mod test {
             path: "/home/user/.password-store/.git".to_string(),
             filetype: FileTypeAPI::FILE,
             last_modified: SystemTime::now(),
+            has_parent_keys: true,
             encrypt_keys_id: None,
         };
 
@@ -153,6 +157,7 @@ mod test {
             path: "/home/user/.password-store/git".to_string(),
             filetype: FileTypeAPI::FILE,
             last_modified: SystemTime::now(),
+            has_parent_keys: true,
             encrypt_keys_id: None,
         };
 
@@ -189,6 +194,7 @@ mod test {
                 .to_string()
         );
         assert_eq!(file_details.filetype, FileTypeAPI::FILE);
+        assert!(file_details.has_parent_keys);
         assert_eq!(file_details.encrypt_keys_id, None);
         assert!(file_details.is_cached() == false);
 
@@ -224,6 +230,7 @@ mod test {
                 .to_string()
         );
         assert_eq!(file_details.filetype, FileTypeAPI::DIRECTORY);
+        assert!(file_details.has_parent_keys);
         assert_eq!(file_details.encrypt_keys_id, None);
         assert!(file_details.is_cached());
 

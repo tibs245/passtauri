@@ -3,15 +3,11 @@ use crate::pass::{
     repository,
 };
 
-use super::keys::folder_gpg_id_or_parents;
-
 pub fn list_password_path(path: &str) -> Result<Vec<FileDetails>, PassError> {
     Ok(repository::file_password::list_files_path(path)?
         .map(|file| -> FileDetails {
             let file_unwraped = file.unwrap();
             FileDetails {
-                encrypt_keys_id: folder_gpg_id_or_parents(file_unwraped.path().to_str().unwrap())
-                    .unwrap_or(None),
                 ..file_unwraped.into()
             }
         })
@@ -30,10 +26,6 @@ pub fn list_folder_tree(path: &str) -> Result<Option<Vec<FolderDetailsWithChildr
                 Ok(FolderDetailsWithChildren {
                     children: children,
                     file_details: FileDetails {
-                        encrypt_keys_id: folder_gpg_id_or_parents(
-                            file_unwraped.path().to_str().unwrap(),
-                        )
-                        .unwrap_or(None),
                         ..file_unwraped.into()
                     },
                 })

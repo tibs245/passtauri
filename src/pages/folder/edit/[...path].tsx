@@ -14,16 +14,16 @@ export default function FolderUpdateForm() {
     const toastError = useToastError();
     const router = useRouter();
     const defaultPath = router.query.path as string[] ?? [];
-    const { data: folder, isLoading, error } = useFolder(defaultPath.length ? '/' + defaultPath.join('/') : "");
+    const { data: folder, isValidating, error } = useFolder(defaultPath.length ? '/' + defaultPath.join('/') : "");
 
     const { trigger: triggerUpdateFolder, isMutating: isUpdatePasswordFolderMutating } = useUpdatePasswordFolder('/' + defaultPath.join('/'));
     const goBack = () => {
         router.push('/');
     }
 
-    const handleUpdateFolder = async ({ path, filename, encryptKeysId }: PassFolder) => {
+    const handleUpdateFolder = async ({ path, filename, encryptKeysId, hasParentKeys }: PassFolder) => {
         try {
-            await triggerUpdateFolder({ newPath: path + filename, keys: (encryptKeysId ?? []) });
+            await triggerUpdateFolder({ newPath: [path, filename].join('/'), keys: (encryptKeysId ?? []), hasParentKeys });
             toastSuccess({ title: `Folder «${filename}» is Updated` });
             router.push('/')
         } catch (error: unknown) {
@@ -40,7 +40,7 @@ export default function FolderUpdateForm() {
             <Spacer />
             <Button leftIcon={<Icon as={FiXCircle} />} colorScheme="red" variant="ghost" onClick={goBack}>Cancel</Button>
         </Stack>
-        {isLoading || folder === undefined ?
+        {isValidating || folder === undefined ?
             <Loading /> :
             <FolderForm folderFile={folder} isMutating={isUpdatePasswordFolderMutating} onSubmit={handleUpdateFolder} onCancel={goBack} />
         }

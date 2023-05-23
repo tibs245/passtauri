@@ -1,7 +1,7 @@
 use rand::Rng;
 
 use crate::pass::{
-    entities::{error::PassError, password_data::PasswordData},
+    entities::{error::PassError, pass_item::PassItem, password_data::PasswordData},
     repository,
 };
 
@@ -26,7 +26,9 @@ pub fn create_password(password_data: PasswordData, path: &str) -> Result<(), Pa
     if repository::file_password::is_file_exist(path) {
         Err(PassError::PasswordFileAlreadyExists)
     } else {
-        encrypt_password(password_data, path)
+        let keys = PassItem::from(path).default_keys_gpg_id().unwrap().unwrap();
+
+        encrypt_password(password_data, path, keys)
     }
 }
 
@@ -53,7 +55,12 @@ pub fn update_password(password_data: PasswordData, password_path: &str) -> Resu
         )?;
         delete_password(password_path)
     } else {
-        encrypt_password(password_data, password_path)
+        let keys = PassItem::from(password_path)
+            .default_keys_gpg_id()
+            .unwrap()
+            .unwrap();
+
+        encrypt_password(password_data, password_path, keys)
     }
 }
 

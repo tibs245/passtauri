@@ -4,6 +4,7 @@ export type PassFile = {
     filetype: "FILE" | "DIRECTORY";
     lastModified?: string;
     encryptKeysId?: string[];
+    hasParentKeys: boolean;
 }
 
 export type PassFolder = PassFile & {

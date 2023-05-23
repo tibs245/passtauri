@@ -24,6 +24,7 @@ pub enum PassError {
     FsErrorOnMoveFolder(Error),
     FolderDontExists(String),
     UnableParseFileDetailsFromStr(ParseFileDetailsErr),
+    PathNotFound(String),
 }
 impl From<&PassError> for String {
     fn from(pass_error: &PassError) -> String {
@@ -80,6 +81,9 @@ impl From<&PassError> for String {
             }
             PassError::UnableParseFileDetailsFromStr(error) => {
                 format!("Error on parse file details from path : {:?}", error)
+            }
+            PassError::PathNotFound(path) => {
+                format!("Path not found : {}", path)
             }
         }
     }

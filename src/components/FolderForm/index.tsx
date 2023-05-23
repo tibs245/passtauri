@@ -1,9 +1,10 @@
-import { Button, Stack, Text, Input, Box, InputGroup, FormControl, FormErrorMessage, Spinner, Flex } from "@chakra-ui/react";
+import { Button, Stack, Text, Input, Box, InputGroup, FormControl, FormErrorMessage, Spinner, Flex, Checkbox } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FolderOption, PassFile, PassFolder } from "@/types/file";
 import Select, { OptionFolderComponent, OptionKeyComponent, usePathOptions, useKeysOptions } from "@/components/Select";
 import { KeyOption, KeyOptionNewUnknowKey } from "@/types/key";
 import Loading from "@/components/Loading";
+import { useFolder } from "@/hooks/folder";
 
 type FolderFormProps = {
     folderFile: PassFolder,
@@ -26,6 +27,7 @@ type PassFolderFormValues = Omit<PassFile, "path" | "encryptKeysId"> & {
     children?: PassFolder[];
     path?: FolderOption;
     encryptKeysId: KeyOption[];
+    hasParentKeys: boolean;
 }
 
 const passFolderFromPassFolderFormValues = ({ path, encryptKeysId, ...rest }: PassFolderFormValues): PassFolder => {
@@ -57,7 +59,7 @@ export default function LoadFolderForm(props: FolderFormProps) {
 }
 
 function FolderForm({ folderFile, isMutating, onSubmit, onCancel, pathOptions, keysOptions }: FolderFormLoadedProps) {
-    const { control, register, handleSubmit, formState: { errors } } = useForm<PassFolderFormValues>({
+    const { control, register, handleSubmit, formState: { errors }, watch } = useForm<PassFolderFormValues>({
         defaultValues: {
             ...(passFolderFormValuesFromPassFolder(folderFile, pathOptions, keysOptions) ?? {})
         }
@@ -66,6 +68,9 @@ function FolderForm({ folderFile, isMutating, onSubmit, onCancel, pathOptions, k
     const handleSubmitMapper = (formValues: PassFolderFormValues) => {
         onSubmit(passFolderFromPassFolderFormValues(formValues))
     }
+
+    const { data: parent } = useFolder(watch("path")?.value)
+    const parentsKeysOptions = parent?.encryptKeysId?.map(keyId => keysOptions.find(k => k.value === keyId) ?? KeyOptionNewUnknowKey(keyId)) ?? []
 
     return (<>
         <form onSubmit={handleSubmit(handleSubmitMapper)}>
@@ -97,9 +102,13 @@ function FolderForm({ folderFile, isMutating, onSubmit, onCancel, pathOptions, k
                     </FormControl>
                 </Box>
                 <Box>
-                    <Text>Key</Text>
+                    <Text>Keys</Text>
                     <FormControl isInvalid={!!errors.path}>
-                        <Select<PassFolderFormValues, KeyOption, true> useBasicStyles
+                        <Checkbox {...register("hasParentKeys")}>Use parents keys</Checkbox>
+                        <Select<PassFolderFormValues, KeyOption, true>
+                            isDisabled={watch('hasParentKeys')}
+                            value={watch('hasParentKeys') ? parentsKeysOptions : watch('encryptKeysId')}
+                            useBasicStyles
                             placeholder='Select keys'
                             options={keysOptions}
                             isMulti

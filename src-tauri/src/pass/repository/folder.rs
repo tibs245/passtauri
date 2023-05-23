@@ -1,7 +1,7 @@
 use fs_extra::{self, dir::CopyOptions};
 use std::fs;
 extern crate dirs;
-use crate::pass::entities::error::PassError;
+use crate::pass::entities::{error::PassError, pass_item::PassItem};
 
 pub fn password_store_path() -> Result<String, PassError> {
     match dirs::home_dir() {
@@ -10,16 +10,26 @@ pub fn password_store_path() -> Result<String, PassError> {
     }
 }
 
-pub fn create_pass_folder(folder_path: &str, keys: Vec<&str>) -> Result<(), PassError> {
+pub fn create_pass_folder(
+    folder_path: &str,
+    keys: Vec<&str>,
+    has_parent_keys: bool,
+) -> Result<(), PassError> {
     match fs::create_dir(folder_path) {
-        Ok(()) => write_keys_file(folder_path, keys),
+        Ok(()) => {
+            if !has_parent_keys {
+                write_keys_file(folder_path, keys)
+            } else {
+                Ok(())
+            }
+        }
         Err(error) => Err(PassError::UnableToWritePasswordFile(error)),
     }
 }
 
 pub fn write_keys_file(folder_path: &str, key: Vec<&str>) -> Result<(), PassError> {
     match fs::write(
-        folder_path.to_owned() + &"/.gpg-id",
+        PassItem::from(folder_path).keys_file_path(),
         key.join("\n").to_owned() + "\n",
     ) {
         Ok(()) => Ok(()),

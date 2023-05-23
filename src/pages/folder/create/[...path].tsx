@@ -19,9 +19,9 @@ export default function FolderCreateForm() {
         router.push('/');
     }
 
-    const handleCreateFolder = async ({ path, filename, encryptKeysId }: PassFolder) => {
+    const handleCreateFolder = async ({ path, filename, encryptKeysId, hasParentKeys }: PassFolder) => {
         try {
-            await triggerCreateFolder({ path: path + '/' + filename, keys: (encryptKeysId ?? []) });
+            await triggerCreateFolder({ path: path + '/' + filename, keys: (encryptKeysId ?? []), hasParentKeys });
             toastSuccess({ title: `Folder «${filename}» is created` });
             router.push('/')
         } catch (error: unknown) {
@@ -37,6 +37,7 @@ export default function FolderCreateForm() {
         path: (process.env.NEXT_PUBLIC_PASSWORD_STORE ?? '') + '/' + (defaultPath?.length ? [...defaultPath, ''].join('/') : ""),
         filetype: "DIRECTORY",
         filename: "",
+        hasParentKeys: true,
     }
 
     return <>
